@@ -1,0 +1,1458 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Multi-User Habit Tracker & Printable Calendar</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts (Inter) -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js CDN for Visualization Graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc;
+        }
+
+        /* Custom Scrollbar for nicer UI */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+
+        /* Custom Checkbox Design */
+        .habit-checkbox {
+            position: relative;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .habit-checkbox:checked {
+            animation: pop 0.2s ease-in-out;
+        }
+
+        @keyframes pop {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.15); }
+            100% { transform: scale(1); }
+        }
+
+        /* PRINT-SPECIFIC STYLES */
+        @media print {
+            body {
+                background: white !important;
+                color: black !important;
+                font-size: 10pt;
+            }
+            
+            /* Hide UI Elements */
+            .no-print {
+                display: none !important;
+            }
+
+            /* Container Adjustments */
+            .print-container {
+                width: 100% !important;
+                max-width: 100% !important;
+                padding: 0 !important;
+                margin: 0 !important;
+                box-shadow: none !important;
+            }
+
+            /* Grid Layout for Portrait or Landscape standard printing */
+            .calendar-grid-header {
+                display: grid !important;
+                grid-template-columns: repeat(7, 1fr) !important;
+                border-top: 2px solid #000 !important;
+                border-bottom: 2px solid #000 !important;
+                background-color: #f1f5f9 !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .calendar-grid {
+                display: grid !important;
+                grid-template-columns: repeat(7, 1fr) !important;
+                grid-auto-rows: minmax(110px, auto) !important;
+                border: 1px solid #cbd5e1 !important;
+                gap: 0 !important;
+            }
+
+            /* Cells standard printable border */
+            .day-cell {
+                border-right: 1px solid #cbd5e1 !important;
+                border-bottom: 1px solid #cbd5e1 !important;
+                min-height: 100px !important;
+                background: white !important;
+                padding: 4px !important;
+                box-shadow: none !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            .day-cell:nth-child(7n) {
+                border-right: none !important;
+            }
+
+            /* Highlight checked items beautifully for printers */
+            .print-checked-text {
+                text-decoration: line-through !important;
+                color: #64748b !important;
+            }
+
+            .print-checked-checkbox {
+                border-color: #000000 !important;
+                background-color: #000000 !important;
+                color: white !important;
+                -webkit-print-color-adjust: exact;
+                print-color-adjust: exact;
+            }
+
+            /* Header configuration */
+            .print-header {
+                display: flex !important;
+                justify-content: space-between !important;
+                align-items: center !important;
+                margin-bottom: 15px !important;
+            }
+
+            /* Auto landscape options */
+            @page {
+                size: landscape;
+                margin: 0.4in;
+            }
+        }
+    </style>
+</head>
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
+
+    <!-- TOP NAVIGATION -->
+    <header class="bg-white border-b border-slate-200 py-4 px-6 sticky top-0 z-10 no-print shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <!-- App Title -->
+            <div class="flex items-center gap-3">
+                <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md shadow-indigo-100 flex items-center justify-center">
+                    <i class="fa-solid fa-calendar-check text-xl"></i>
+                </div>
+                <div>
+                    <h1 class="text-xl font-bold text-slate-950 tracking-tight font-extrabold">Family Habit Calendar</h1>
+                    <p class="text-xs text-slate-500 font-medium">Track family goals, log measurements, and print custom monthly routines</p>
+                </div>
+            </div>
+
+            <!-- Print Actions & Views -->
+            <div class="flex flex-wrap items-center gap-2">
+                <!-- Status Badge -->
+                <div id="cloudStatusBadge">
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
+                        Syncing...
+                    </span>
+                </div>
+                <!-- View Switcher Tabs -->
+                <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+                    <button id="viewCalBtn" onclick="switchMainView('calendar')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5">
+                        <i class="fa-solid fa-calendar-days"></i> Calendar
+                    </button>
+                    <button id="viewDashBtn" onclick="switchMainView('dashboard')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                    </button>
+                </div>
+                <button onclick="window.print()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2 px-4 rounded-xl shadow-lg shadow-indigo-100 transition duration-150 flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-print"></i>
+                    <span>Print Tracker</span>
+                </button>
+                <button onclick="triggerResetConfirmModal()" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-semibold text-sm py-2 px-4 rounded-xl transition duration-150 flex items-center gap-2 cursor-pointer">
+                    <i class="fa-solid fa-trash-can"></i>
+                    <span>Reset All</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- MAIN BODY -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6 print-container">
+        
+        <!-- LEFT SIDE PANEL (no-print) -->
+        <aside class="w-full lg:w-80 flex flex-col gap-6 no-print shrink-0">
+            
+            <!-- PARTICIPANT SELECTION SYSTEM -->
+            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-user-group text-indigo-500"></i> Participants
+                    </h3>
+                </div>
+                
+                <!-- Participant Buttons Selector -->
+                <div id="participantButtons" class="space-y-2 mb-4">
+                    <!-- Loaded dynamically via JS -->
+                </div>
+
+                <!-- Add Participant Form -->
+                <form id="addParticipantForm" onsubmit="addParticipant(event)" class="pt-3 border-t border-slate-100">
+                    <label for="newParticipantName" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5 font-bold">Add Participant</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newParticipantName" placeholder="e.g. Mom" max="20" class="flex-grow bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
+                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm" title="Add Participant">
+                            <i class="fa-solid fa-plus font-bold"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- BODY METRICS ENTRY PANEL -->
+            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-weight-scale text-indigo-500"></i> Log Body Metrics
+                    </h3>
+                    <span id="activePersonMetricLabel" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">Emily</span>
+                </div>
+                <p class="text-xs text-slate-400 mb-3 leading-relaxed">Enter weight & tummy size logs to chart progress in the Dashboard.</p>
+
+                <form onsubmit="saveBodyMetrics(event)" class="space-y-3">
+                    <div>
+                        <label for="metricDate" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Log Date</label>
+                        <input type="date" id="metricDate" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                    </div>
+                    <div class="grid grid-cols-2 gap-2">
+                        <div>
+                            <label for="metricWeight" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Weight (lbs/kg)</label>
+                            <input type="number" step="0.1" id="metricWeight" placeholder="e.g. 154.5" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                        </div>
+                        <div>
+                            <label for="metricTummy" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Tummy (in/cm)</label>
+                            <input type="number" step="0.1" id="metricTummy" placeholder="e.g. 32.0" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow transition flex items-center justify-center gap-1.5 cursor-pointer">
+                        <i class="fa-solid fa-floppy-disk"></i> Log Measurements
+                    </button>
+                </form>
+            </section>
+
+            <!-- CALENDAR NAVIGATOR -->
+            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
+                    <i class="fa-solid fa-sliders text-indigo-500"></i> Change Month
+                </h3>
+                
+                <div class="space-y-3">
+                    <div>
+                        <label for="monthSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Month</label>
+                        <select id="monthSelect" onchange="changeDate()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                            <option value="0">January</option>
+                            <option value="1">February</option>
+                            <option value="2">March</option>
+                            <option value="3">April</option>
+                            <option value="4">May</option>
+                            <option value="5">June</option>
+                            <option value="6">July</option>
+                            <option value="7">August</option>
+                            <option value="8">September</option>
+                            <option value="9">October</option>
+                            <option value="10">November</option>
+                            <option value="11">December</option>
+                        </select>
+                    </div>
+
+                    <div>
+                        <label for="yearSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Year</label>
+                        <select id="yearSelect" onchange="changeDate()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                            <!-- Populated in JS -->
+                        </select>
+                    </div>
+                </div>
+
+                <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
+                    <button onclick="navigateMonth(-1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200" title="Previous Month">
+                        <i class="fa-solid fa-chevron-left"></i>
+                    </button>
+                    <button onclick="goToCurrentMonth()" class="px-4 py-2 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200 flex-1 flex justify-center">
+                        Today
+                    </button>
+                    <button onclick="navigateMonth(1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200" title="Next Month">
+                        <i class="fa-solid fa-chevron-right"></i>
+                    </button>
+                </div>
+            </section>
+
+            <!-- HABIT TRACKER / MANAGER -->
+            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="flex items-center justify-between mb-3">
+                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+                        <i class="fa-solid fa-list-check text-indigo-500"></i> Habits List
+                    </h3>
+                    <span id="habitsCount" class="bg-indigo-50 text-indigo-600 text-xs px-2.5 py-0.5 rounded-full font-bold">4</span>
+                </div>
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">Changes to habits will update the dynamic layout for all participants.</p>
+
+                <!-- List of current active habits -->
+                <ul id="habitsList" class="space-y-2.5 max-h-56 overflow-y-auto mb-4 pr-1">
+                    <!-- Loaded dynamically via JS -->
+                </ul>
+
+                <!-- Add a custom habit form -->
+                <form id="addHabitForm" onsubmit="addHabit(event)" class="pt-3 border-t border-slate-100">
+                    <label for="newHabitName" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Add Custom Habit</label>
+                    <div class="flex gap-2">
+                        <input type="text" id="newHabitName" placeholder="e.g. Read 15 mins" max="30" class="flex-grow bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
+                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm" title="Add Habit">
+                            <i class="fa-solid fa-plus font-bold"></i>
+                        </button>
+                    </div>
+                </form>
+            </section>
+
+            <!-- COMPARATIVE SCOREBOARD -->
+            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-chart-simple text-indigo-500"></i> Family Leaderboard
+                </h3>
+                <p class="text-xs text-slate-400 mb-4 leading-relaxed">Monthly track records compared side-by-side.</p>
+                
+                <div id="leaderboardContainer" class="space-y-3">
+                    <!-- Populated dynamically via JS -->
+                </div>
+            </section>
+
+        </aside>
+
+        <!-- CALENDAR WORKSPACE (PRINTABLE & DYNAMIC) -->
+        <div class="flex-grow flex flex-col gap-4">
+            <!-- Custom Banner shown only in Printout -->
+            <div class="hidden print-header flex justify-between items-center border-b-2 border-slate-900 pb-3">
+                <div>
+                    <h2 id="printTitle" class="text-2xl font-black uppercase text-slate-900 tracking-tight">Emily's Habit Tracker - July 2026</h2>
+                    <p class="text-xs font-semibold text-slate-500">Monthly Performance Grid & Daily Consistency Log</p>
+                </div>
+                <div class="text-right">
+                    <span id="printStats" class="text-base font-bold text-slate-900">Completion: 0%</span>
+                    <p class="text-[9px] text-slate-400 mt-0.5">Family Habit Calendar Document</p>
+                </div>
+            </div>
+
+            <!-- TAB 1: CALENDAR VIEW SECTION -->
+            <div id="calendarViewSection" class="flex flex-col gap-4">
+                <!-- Calendar Dynamic Header -->
+                <div class="no-print flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                    <div>
+                        <div class="flex items-center gap-2.5">
+                            <span id="headerParticipantBadge" class="px-2.5 py-0.5 text-xs font-bold bg-indigo-100 text-indigo-700 rounded-lg">EMILY</span>
+                            <h2 id="calendarHeaderTitle" class="text-2xl font-black text-slate-900 tracking-tight">July 2026</h2>
+                        </div>
+                        <p class="text-xs font-semibold text-slate-500 mt-1.5">Click checkboxes below to mark daily items for the active person.</p>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        <div class="text-right flex flex-col items-end">
+                            <div class="flex items-center gap-1.5 text-xs font-bold text-slate-500">
+                                <span>Month Completion:</span>
+                                <span id="completionPercentage" class="text-sm font-extrabold text-indigo-600">0%</span>
+                            </div>
+                            <div class="w-24 bg-slate-100 h-1.5 rounded-full mt-1 overflow-hidden">
+                                <div id="headerProgressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- THE CALENDAR WRAPPER -->
+                <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-5 shadow-sm flex-grow flex flex-col justify-between print:border-none print:p-0 print:shadow-none">
+                    <!-- Days of Week Header -->
+                    <div class="grid grid-cols-7 text-center gap-1 sm:gap-2 mb-2 font-bold text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3 calendar-grid-header print:pb-1 print:border-slate-800">
+                        <div class="py-1 text-rose-500">Sun</div>
+                        <div class="py-1">Mon</div>
+                        <div class="py-1">Tue</div>
+                        <div class="py-1">Wed</div>
+                        <div class="py-1">Thu</div>
+                        <div class="py-1">Fri</div>
+                        <div class="py-1">Sat</div>
+                    </div>
+
+                    <!-- Days Grid -->
+                    <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5 sm:gap-3 flex-grow calendar-grid print:gap-0">
+                        <!-- Populated dynamically via JS -->
+                    </div>
+                </div>
+
+                <!-- Helpful tips section below the calendar -->
+                <div class="no-print bg-slate-100/60 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                    <div class="bg-white p-2 border border-slate-200 rounded-xl flex items-center justify-center shrink-0">
+                        <i class="fa-solid fa-circle-info text-indigo-500 text-lg"></i>
+                    </div>
+                    <div class="text-xs text-slate-600 leading-relaxed">
+                        <strong>Tip:</strong> Select a participant in the sidebar to log items for them. Your data saves automatically as you check off habits or update metrics.
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB 2: VISUALIZATION DASHBOARD VIEW SECTION -->
+            <div id="dashboardViewSection" class="hidden flex flex-col gap-6 no-print">
+                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+                    <div>
+                        <div class="flex items-center gap-2">
+                            <span class="bg-indigo-50 text-indigo-600 text-xs font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wide">
+                                Progress Analytics
+                            </span>
+                            <h2 id="dashParticipantTitle" class="text-2xl font-black text-slate-900 tracking-tight">Emily's Fitness & Task Dashboard</h2>
+                        </div>
+                        <p class="text-xs text-slate-500 font-medium mt-1">Real-time visualization charts comparing weight, tummy size, and habit execution consistency.</p>
+                    </div>
+                    <div class="flex items-center gap-3">
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-center">
+                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Logged Entries</span>
+                            <span id="dashMetricCount" class="text-sm font-black text-indigo-600">0 logs</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- DASHBOARD CHARTS GRID -->
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    
+                    <!-- CHART 1: WEIGHT & TUMMY SIZE TRENDS -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-tape text-indigo-500"></i>
+                                <h3 class="font-bold text-slate-900 text-sm">Body Metrics Progression</h3>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">Dual Metric Trend</span>
+                        </div>
+                        <div class="relative w-full min-h-[260px] flex items-center justify-center">
+                            <canvas id="bodyMetricsChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- CHART 2: DAILY HABIT CONSISTENCY -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-chart-column text-indigo-500"></i>
+                                <h3 class="font-bold text-slate-900 text-sm">Daily Habit Execution Trend</h3>
+                            </div>
+                            <span id="dashChartMonthLabel" class="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded-full">July 2026</span>
+                        </div>
+                        <div class="relative w-full min-h-[260px] flex items-center justify-center">
+                            <canvas id="habitConsistencyChart"></canvas>
+                        </div>
+                    </div>
+
+                    <!-- CHART 3: HABIT BREAKDOWN (DOUGHNUT) -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3 lg:col-span-2">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                            <div class="flex items-center gap-2">
+                                <i class="fa-solid fa-pie-chart text-indigo-500"></i>
+                                <h3 class="font-bold text-slate-900 text-sm">Habit Completion Comparison Breakdown</h3>
+                            </div>
+                            <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">Monthly Breakdown</span>
+                        </div>
+                        <div class="relative w-full max-h-[280px] flex justify-center items-center py-2">
+                            <canvas id="habitBreakdownChart" class="max-w-md max-h-[260px]"></canvas>
+                        </div>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- CONFIRMATION OVERLAY MODAL -->
+    <div id="modalOverlay" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+        <div class="bg-white rounded-2xl max-w-md w-full p-6 shadow-2xl border border-slate-100 transform transition-all scale-95 opacity-0 duration-200" id="modalBox">
+            <div class="flex items-start gap-4">
+                <div class="bg-rose-50 text-rose-600 p-3 rounded-xl flex items-center justify-center">
+                    <i class="fa-solid fa-triangle-exclamation text-xl"></i>
+                </div>
+                <div>
+                    <h3 class="font-bold text-slate-900 text-lg">Are you absolutely sure?</h3>
+                    <p class="text-slate-500 text-sm mt-1 leading-relaxed">This action will permanently wipe your checklist logs, customizable habits, and all participant records, reverting to system defaults.</p>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2.5 mt-6 pt-4 border-t border-slate-100">
+                <button onclick="closeConfirmModal()" class="px-4 py-2 text-xs font-semibold text-slate-600 hover:bg-slate-50 border border-slate-200 rounded-xl transition cursor-pointer">Cancel</button>
+                <button onclick="executeReset()" class="px-4 py-2 text-xs font-semibold text-white bg-rose-600 hover:bg-rose-700 rounded-xl transition cursor-pointer">Confirm Reset</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- NOTIFICATION BANNER -->
+    <div id="notificationBanner" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl border border-slate-800 transform translate-y-24 opacity-0 transition duration-300 pointer-events-none flex items-center gap-3">
+        <span id="notifIcon" class="bg-indigo-500/20 text-indigo-400 p-1.5 rounded-lg flex items-center justify-center text-xs">
+            <i class="fa-solid fa-circle-check"></i>
+        </span>
+        <span id="notifMessage" class="text-sm font-semibold">Action completed successfully.</span>
+    </div>
+
+    <!-- FIREBASE SDK & APP CONFIGURATION -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, getDoc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Environment Variables Configuration
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'family-habit-tracker';
+        const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        // Application State Configuration
+        let db = null;
+        let auth = null;
+        let userId = 'local-user';
+        let isSaving = false;
+
+        // Chart Instance Holds
+        let bodyChartInstance = null;
+        let consistencyChartInstance = null;
+        let breakdownChartInstance = null;
+
+        // Global State Variables
+        window.currentDate = new Date();
+        window.activeMainView = 'calendar'; // 'calendar' or 'dashboard'
+        window.habits = ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
+        window.participants = ['Emily', 'Dad', 'Stephanie'];
+        window.activeParticipant = 'Emily';
+        window.completions = {}; // Schema: { participant: { dateString: { habit: boolean } } }
+        window.bodyMetrics = {}; // Schema: { participant: { dateString: { weight: number, tummy: number } } }
+
+        const MONTH_NAMES = [
+            "January", "February", "March", "April", "May", "June",
+            "July", "August", "September", "October", "November", "December"
+        ];
+
+        window.switchMainView = function(viewName) {
+            window.activeMainView = viewName;
+            const calSec = document.getElementById('calendarViewSection');
+            const dashSec = document.getElementById('dashboardViewSection');
+            const calBtn = document.getElementById('viewCalBtn');
+            const dashBtn = document.getElementById('viewDashBtn');
+
+            if (viewName === 'calendar') {
+                calSec.classList.remove('hidden');
+                dashSec.classList.add('hidden');
+                calBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5";
+                dashBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5";
+            } else {
+                calSec.classList.add('hidden');
+                dashSec.classList.remove('hidden');
+                dashBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5";
+                calBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5";
+                renderDashboardCharts();
+            }
+        }
+
+        window.saveBodyMetrics = function(e) {
+            e.preventDefault();
+            const dateVal = document.getElementById('metricDate').value;
+            const weightVal = parseFloat(document.getElementById('metricWeight').value);
+            const tummyVal = parseFloat(document.getElementById('metricTummy').value);
+
+            if (!dateVal || isNaN(weightVal) || isNaN(tummyVal)) {
+                showToast("Please fill in valid date, weight, and tummy measurements.", "fa-circle-exclamation");
+                return;
+            }
+
+            if (!window.bodyMetrics[window.activeParticipant]) {
+                window.bodyMetrics[window.activeParticipant] = {};
+            }
+
+            window.bodyMetrics[window.activeParticipant][dateVal] = {
+                weight: weightVal,
+                tummy: tummyVal
+            };
+
+            saveStateToCloud();
+            showToast(`Logged body metrics for ${window.activeParticipant}!`, "fa-weight-scale");
+
+            // Reset inputs
+            document.getElementById('metricWeight').value = '';
+            document.getElementById('metricTummy').value = '';
+
+            if (window.activeMainView === 'dashboard') {
+                renderDashboardCharts();
+            }
+        }
+
+        window.renderDashboardCharts = function() {
+            const title = document.getElementById('dashParticipantTitle');
+            if (title) title.textContent = `${window.activeParticipant}'s Progress & Metrics Dashboard`;
+
+            const mLabel = document.getElementById('dashChartMonthLabel');
+            if (mLabel) mLabel.textContent = `${MONTH_NAMES[window.currentDate.getMonth()]} ${window.currentDate.getFullYear()}`;
+
+            const activeMetrics = window.bodyMetrics[window.activeParticipant] || {};
+            const loggedDates = Object.keys(activeMetrics).sort();
+
+            const countBadge = document.getElementById('dashMetricCount');
+            if (countBadge) countBadge.textContent = `${loggedDates.length} body logs`;
+
+            // CHART 1: Body Metrics Dual Axis Line Chart
+            const ctxBody = document.getElementById('bodyMetricsChart')?.getContext('2d');
+            if (ctxBody) {
+                if (bodyChartInstance) bodyChartInstance.destroy();
+
+                const weights = loggedDates.map(d => activeMetrics[d].weight);
+                const tummies = loggedDates.map(d => activeMetrics[d].tummy);
+
+                bodyChartInstance = new Chart(ctxBody, {
+                    type: 'line',
+                    data: {
+                        labels: loggedDates.length > 0 ? loggedDates : ['No Data'],
+                        datasets: [
+                            {
+                                label: 'Weight (lbs/kg)',
+                                data: weights.length > 0 ? weights : [0],
+                                borderColor: '#4f46e5',
+                                backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                yAxisID: 'yWeight'
+                            },
+                            {
+                                label: 'Tummy Size (in/cm)',
+                                data: tummies.length > 0 ? tummies : [0],
+                                borderColor: '#ec4899',
+                                backgroundColor: 'rgba(236, 72, 153, 0.1)',
+                                fill: true,
+                                tension: 0.3,
+                                yAxisID: 'yTummy'
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        interaction: { mode: 'index', intersect: false },
+                        scales: {
+                            yWeight: {
+                                type: 'linear',
+                                display: true,
+                                position: 'left',
+                                title: { display: true, text: 'Weight' }
+                            },
+                            yTummy: {
+                                type: 'linear',
+                                display: true,
+                                position: 'right',
+                                grid: { drawOnChartArea: false },
+                                title: { display: true, text: 'Tummy Size' }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // CHART 2: Daily Habit Consistency
+            const ctxConsistency = document.getElementById('habitConsistencyChart')?.getContext('2d');
+            if (ctxConsistency) {
+                if (consistencyChartInstance) consistencyChartInstance.destroy();
+
+                const year = window.currentDate.getFullYear();
+                const month = window.currentDate.getMonth();
+                const totalDays = new Date(year, month + 1, 0).getDate();
+                
+                const labels = [];
+                const dailyCompletions = [];
+                const personLogs = window.completions[window.activeParticipant] || {};
+
+                for (let d = 1; d <= totalDays; d++) {
+                    const dStr = formatDateKey(year, month, d);
+                    labels.push(`Day ${d}`);
+                    const dayLogs = personLogs[dStr] || {};
+                    let count = 0;
+                    window.habits.forEach(h => { if (dayLogs[h] === true) count++; });
+                    dailyCompletions.push(count);
+                }
+
+                consistencyChartInstance = new Chart(ctxConsistency, {
+                    type: 'bar',
+                    data: {
+                        labels: labels,
+                        datasets: [{
+                            label: 'Habits Completed',
+                            data: dailyCompletions,
+                            backgroundColor: '#6366f1',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                max: Math.max(window.habits.length, 1),
+                                ticks: { stepSize: 1 }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // CHART 3: Habit Breakdown Doughnut
+            const ctxBreakdown = document.getElementById('habitBreakdownChart')?.getContext('2d');
+            if (ctxBreakdown) {
+                if (breakdownChartInstance) breakdownChartInstance.destroy();
+
+                const year = window.currentDate.getFullYear();
+                const month = window.currentDate.getMonth();
+                const totalDays = new Date(year, month + 1, 0).getDate();
+                const personLogs = window.completions[window.activeParticipant] || {};
+
+                const habitTotals = window.habits.map(h => {
+                    let total = 0;
+                    for (let d = 1; d <= totalDays; d++) {
+                        const dStr = formatDateKey(year, month, d);
+                        if (personLogs[dStr]?.[h] === true) total++;
+                    }
+                    return total;
+                });
+
+                const bgColors = ['#6366f1', '#ec4899', '#10b981', '#f59e0b', '#8b5cf6', '#06b6d4'];
+
+                breakdownChartInstance = new Chart(ctxBreakdown, {
+                    type: 'doughnut',
+                    data: {
+                        labels: window.habits.length > 0 ? window.habits : ['No Habits'],
+                        datasets: [{
+                            data: habitTotals.length > 0 ? habitTotals : [0],
+                            backgroundColor: bgColors.slice(0, Math.max(window.habits.length, 1))
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: { position: 'bottom' }
+                        }
+                    }
+                });
+            }
+        }
+
+        // INITIALIZATION ROUTINE
+        window.onload = function() {
+            populateYearSelect();
+            syncDateSelectors();
+            const todayStr = new Date().toISOString().split('T')[0];
+            const mInput = document.getElementById('metricDate');
+            if (mInput) mInput.value = todayStr;
+            
+            initFirebase();
+        }
+
+        async function initFirebase() {
+            if (!firebaseConfig) {
+                loadFallbackLocalState();
+                updateCloudStatusBadge(false);
+                renderAll();
+                return;
+            }
+
+            try {
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (initialAuthToken) {
+                    await signInWithCustomToken(auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                onAuthStateChanged(auth, (user) => {
+                    if (user) {
+                        userId = user.uid;
+                        updateCloudStatusBadge(true);
+                        setupRealtimeSync();
+                    } else {
+                        userId = 'local-user';
+                        updateCloudStatusBadge(false);
+                        loadFallbackLocalState();
+                        renderAll();
+                    }
+                });
+
+            } catch (err) {
+                console.error("Firebase connection error:", err);
+                updateCloudStatusBadge(false);
+                loadFallbackLocalState();
+                renderAll();
+            }
+        }
+
+        // REAL-TIME FIRESTORE SYNC
+        function setupRealtimeSync() {
+            if (!db || !userId || userId === 'local-user') return;
+
+            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'trackerState');
+
+            onSnapshot(docRef, (docSnap) => {
+                if (isSaving) return;
+                
+                if (docSnap.exists()) {
+                    const cloudData = docSnap.data();
+                    window.habits = cloudData.habits || ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
+                    window.participants = cloudData.participants || ['Emily', 'Dad', 'Stephanie'];
+                    
+                    if (window.participants.includes(cloudData.activeParticipant)) {
+                        window.activeParticipant = cloudData.activeParticipant;
+                    } else if (window.participants.length > 0) {
+                        window.activeParticipant = window.participants[0];
+                    } else {
+                        window.activeParticipant = 'Emily';
+                    }
+
+                    window.completions = cloudData.completions || {};
+                    window.bodyMetrics = cloudData.bodyMetrics || {};
+                } else {
+                    window.habits = ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
+                    window.participants = ['Emily', 'Dad', 'Stephanie'];
+                    window.activeParticipant = 'Emily';
+                    window.completions = {};
+                    window.bodyMetrics = {};
+                    saveStateToCloud();
+                }
+                renderAll();
+            }, (error) => {
+                console.error("Realtime sync error:", error);
+                updateCloudStatusBadge(false);
+                loadFallbackLocalState();
+                renderAll();
+            });
+        }
+
+        // SAVE STATE
+        async function saveStateToCloud() {
+            updateStats();
+            
+            if (!db || !userId || userId === 'local-user') {
+                saveFallbackLocalState();
+                return;
+            }
+
+            isSaving = true;
+            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'trackerState');
+            try {
+                await setDoc(docRef, {
+                    habits: window.habits,
+                    participants: window.participants,
+                    activeParticipant: window.activeParticipant,
+                    completions: window.completions,
+                    bodyMetrics: window.bodyMetrics
+                });
+            } catch (err) {
+                console.error("Failed to commit changes:", err);
+                showToast("Save delayed. Re-syncing.", "fa-triangle-exclamation");
+            } finally {
+                isSaving = false;
+            }
+        }
+
+        // LOCAL STORAGE FALLBACK
+        function loadFallbackLocalState() {
+            const raw = localStorage.getItem('family_habits_state_v2');
+            if (raw) {
+                try {
+                    const parsed = JSON.parse(raw);
+                    window.habits = parsed.habits || ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
+                    window.participants = parsed.participants || ['Emily', 'Dad', 'Stephanie'];
+                    window.activeParticipant = parsed.activeParticipant || 'Emily';
+                    window.completions = parsed.completions || {};
+                    window.bodyMetrics = parsed.bodyMetrics || {};
+                } catch (e) {
+                    console.error("Local Storage parse error:", e);
+                }
+            }
+        }
+
+        function saveFallbackLocalState() {
+            const payload = {
+                habits: window.habits,
+                participants: window.participants,
+                activeParticipant: window.activeParticipant,
+                completions: window.completions,
+                bodyMetrics: window.bodyMetrics
+            };
+            localStorage.setItem('family_habits_state_v2', JSON.stringify(payload));
+        }
+
+        // BADGE STATUS
+        function updateCloudStatusBadge(isConnected) {
+            const badge = document.getElementById('cloudStatusBadge');
+            if (isConnected) {
+                badge.innerHTML = `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        Cloud Auto-Save Active
+                    </span>`;
+            } else {
+                badge.innerHTML = `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 rounded-full" title="Active on local browser session.">
+                        <i class="fa-solid fa-circle-check text-slate-500"></i>
+                        Local Safe Mode
+                    </span>`;
+            }
+        }
+
+        function populateYearSelect() {
+            const select = document.getElementById('yearSelect');
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear - 5; y <= currentYear + 5; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                select.appendChild(opt);
+            }
+        }
+
+        window.syncDateSelectors = function() {
+            document.getElementById('monthSelect').value = window.currentDate.getMonth();
+            document.getElementById('yearSelect').value = window.currentDate.getFullYear();
+        }
+
+        function renderHeaderAndControls() {
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const monthName = MONTH_NAMES[month];
+
+            const headerTitle = document.getElementById('calendarHeaderTitle');
+            if (headerTitle) headerTitle.textContent = `${monthName} ${year}`;
+
+            const badge = document.getElementById('headerParticipantBadge');
+            if (badge) badge.textContent = window.activeParticipant.toUpperCase();
+
+            const printTitle = document.getElementById('printTitle');
+            if (printTitle) printTitle.textContent = `${window.activeParticipant}'s Habit Tracker - ${monthName} ${year}`;
+        }
+
+        function renderParticipantsUI() {
+            const container = document.getElementById('participantButtons');
+            if (!container) return;
+            container.innerHTML = '';
+
+            window.participants.forEach((person) => {
+                const isActive = (person === window.activeParticipant);
+                
+                const btnWrapper = document.createElement('div');
+                btnWrapper.className = "flex items-center gap-1";
+
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => switchParticipant(person);
+                btn.className = `flex-grow text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between cursor-pointer ${
+                    isActive 
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
+                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="flex items-center gap-2 truncate">
+                        <i class="fa-solid ${isActive ? 'fa-user-check' : 'fa-user'}"></i>
+                        ${person}
+                    </span>
+                    ${isActive ? '<i class="fa-solid fa-chevron-right text-[10px]"></i>' : ''}
+                `;
+
+                btnWrapper.appendChild(btn);
+
+                if (window.participants.length > 1) {
+                    const delBtn = document.createElement('button');
+                    delBtn.type = 'button';
+                    delBtn.onclick = (e) => {
+                        e.stopPropagation();
+                        removeParticipant(person);
+                    };
+                    delBtn.className = "p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer text-xs";
+                    delBtn.title = `Remove ${person}`;
+                    delBtn.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
+                    btnWrapper.appendChild(delBtn);
+                }
+
+                container.appendChild(btnWrapper);
+            });
+        }
+
+        window.addParticipant = function(event) {
+            event.preventDefault();
+            const input = document.getElementById('newParticipantName');
+            const value = input.value.trim();
+
+            if (!value) return;
+
+            if (window.participants.some(p => p.toLowerCase() === value.toLowerCase())) {
+                showToast("Participant already exists!", "fa-circle-exclamation");
+                input.value = '';
+                return;
+            }
+
+            window.participants.push(value);
+            window.activeParticipant = value;
+            input.value = '';
+
+            saveStateToCloud();
+            renderAll();
+            showToast(`Added participant: "${value}"`, "fa-user-plus");
+        }
+
+        function removeParticipant(personName) {
+            if (window.participants.length <= 1) {
+                showToast("Must have at least one participant.", "fa-circle-exclamation");
+                return;
+            }
+
+            window.participants = window.participants.filter(p => p !== personName);
+            if (window.completions[personName]) delete window.completions[personName];
+            if (window.bodyMetrics[personName]) delete window.bodyMetrics[personName];
+
+            if (window.activeParticipant === personName) {
+                window.activeParticipant = window.participants[0];
+            }
+
+            saveStateToCloud();
+            renderAll();
+            showToast(`Removed participant: "${personName}"`, "fa-user-minus");
+        }
+
+        window.renderAll = function() {
+            renderHeaderAndControls();
+            renderParticipantsUI();
+            renderCalendarGrid();
+            renderHabitsList();
+            updateStats();
+
+            const pBadge = document.getElementById('activePersonMetricLabel');
+            if (pBadge) pBadge.textContent = window.activeParticipant;
+
+            if (window.activeMainView === 'dashboard') {
+                renderDashboardCharts();
+            }
+        }
+
+        function switchParticipant(personName) {
+            window.activeParticipant = personName;
+            saveStateToCloud();
+            renderAll();
+        }
+
+        window.renderCalendarGrid = function() {
+            const grid = document.getElementById('calendarDaysGrid');
+            grid.innerHTML = '';
+
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const prevTotalDays = new Date(year, month, 0).getDate();
+
+            const today = new Date();
+            const isCurrentMonthAndYear = (today.getFullYear() === year && today.getMonth() === month);
+
+            const userCompletions = window.completions[window.activeParticipant] || {};
+
+            // 1. Prev month trailing days
+            for (let i = firstDayIndex - 1; i >= 0; i--) {
+                const dayNum = prevTotalDays - i;
+                const prevDateObj = new Date(year, month - 1, dayNum);
+                const dayString = formatDateKey(prevDateObj.getFullYear(), prevDateObj.getMonth(), dayNum);
+                grid.appendChild(createDayCellHTML(dayNum, false, false, dayString, {}));
+            }
+
+            // 2. Active month days
+            for (let dayNum = 1; dayNum <= totalDays; dayNum++) {
+                const isToday = (isCurrentMonthAndYear && today.getDate() === dayNum);
+                const dayString = formatDateKey(year, month, dayNum);
+                const dayCompletions = userCompletions[dayString] || {};
+
+                grid.appendChild(createDayCellHTML(dayNum, true, isToday, dayString, dayCompletions));
+            }
+
+            // 3. Next month leading days
+            const totalGridCells = 42;
+            const currentRenderedCells = firstDayIndex + totalDays;
+            const remainingCells = totalGridCells - currentRenderedCells;
+            const nextMonthTarget = (remainingCells > 7) ? (remainingCells - 7) : remainingCells;
+
+            for (let dayNum = 1; dayNum <= nextMonthTarget; dayNum++) {
+                const nextDateObj = new Date(year, month + 1, dayNum);
+                const dayString = formatDateKey(nextDateObj.getFullYear(), nextDateObj.getMonth(), dayNum);
+                grid.appendChild(createDayCellHTML(dayNum, false, false, dayString, {}));
+            }
+        }
+
+        function formatDateKey(year, month, day) {
+            const formattedMonth = String(month + 1).padStart(2, '0');
+            const formattedDay = String(day).padStart(2, '0');
+            return `${year}-${formattedMonth}-${formattedDay}`;
+        }
+
+        function createDayCellHTML(dayNum, isCurrentMonth, isToday, dayString, dayCompletions) {
+            const cell = document.createElement('div');
+            
+            let classes = "day-cell p-1.5 sm:p-2 border flex flex-col justify-between transition-all relative overflow-hidden ";
+            
+            if (isCurrentMonth) {
+                if (isToday) {
+                    classes += "bg-indigo-50/50 border-indigo-400 ring-2 ring-indigo-200/50 print:bg-white print:border-slate-800 print:ring-0";
+                } else {
+                    classes += "bg-white border-slate-100 hover:border-slate-200 print:border-slate-200";
+                }
+            } else {
+                classes += "bg-slate-50/40 border-slate-100/30 text-slate-400 print:bg-white print:border-slate-100/50";
+            }
+
+            cell.className = classes;
+            cell.setAttribute('data-date', dayString);
+
+            const header = document.createElement('div');
+            header.className = "flex justify-between items-center mb-1 print:mb-0.5";
+            
+            const numSpan = document.createElement('span');
+            numSpan.className = `text-[10px] sm:text-xs font-extrabold ${isToday ? 'bg-indigo-600 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold' : 'text-slate-900'}`;
+            numSpan.textContent = dayNum;
+            header.appendChild(numSpan);
+
+            if (isCurrentMonth) {
+                const percentSpan = document.createElement('span');
+                percentSpan.id = `pct-${dayString}`;
+                percentSpan.className = "text-[9px] font-bold text-slate-400 no-print";
+                header.appendChild(percentSpan);
+            }
+
+            cell.appendChild(header);
+
+            const habitWrapper = document.createElement('div');
+            habitWrapper.className = "flex-grow flex flex-col gap-1 sm:gap-1.5 justify-start mt-1 print:mt-0.5";
+
+            if (isCurrentMonth) {
+                window.habits.forEach((habit) => {
+                    const isChecked = !!dayCompletions[habit];
+                    const rowId = `row-${dayString}-${habit.replace(/\s+/g, '-')}`;
+
+                    const label = document.createElement('label');
+                    label.id = rowId;
+                    label.className = "group flex items-center gap-1.5 sm:gap-2 cursor-pointer p-0.5 rounded hover:bg-slate-50 select-none print:hover:bg-transparent print:p-0";
+
+                    const checkContainer = document.createElement('div');
+                    checkContainer.className = "relative flex items-center justify-center";
+
+                    const cb = document.createElement('input');
+                    cb.type = 'checkbox';
+                    cb.checked = isChecked;
+                    cb.className = "habit-checkbox h-3 w-3 sm:h-3.5 sm:w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition cursor-pointer print-checked-checkbox";
+                    
+                    cb.onchange = (e) => toggleHabit(dayString, habit, e.target.checked);
+                    
+                    checkContainer.appendChild(cb);
+                    label.appendChild(checkContainer);
+
+                    const textSpan = document.createElement('span');
+                    textSpan.className = `text-[9px] sm:text-[10px] font-semibold leading-tight truncate max-w-[50px] sm:max-w-[75px] ${isChecked ? 'line-through text-slate-400 print-checked-text' : 'text-slate-600 group-hover:text-slate-900'}`;
+                    textSpan.textContent = habit;
+                    textSpan.title = habit;
+                    label.appendChild(textSpan);
+
+                    habitWrapper.appendChild(label);
+                });
+            } else {
+                const infoText = document.createElement('p');
+                infoText.className = "text-[8px] italic text-slate-300 text-center py-2";
+                infoText.textContent = "";
+                habitWrapper.appendChild(infoText);
+            }
+
+            cell.appendChild(habitWrapper);
+            return cell;
+        }
+
+        function toggleHabit(dayString, habitName, isChecked) {
+            if (!window.completions[window.activeParticipant]) {
+                window.completions[window.activeParticipant] = {};
+            }
+            if (!window.completions[window.activeParticipant][dayString]) {
+                window.completions[window.activeParticipant][dayString] = {};
+            }
+            
+            window.completions[window.activeParticipant][dayString][habitName] = isChecked;
+
+            const hasCheckedStates = Object.values(window.completions[window.activeParticipant][dayString]).some(v => v === true);
+            if (!hasCheckedStates) {
+                delete window.completions[window.activeParticipant][dayString];
+            }
+
+            const rowId = `row-${dayString}-${habitName.replace(/\s+/g, '-')}`;
+            const labelRow = document.getElementById(rowId);
+            if (labelRow) {
+                const text = labelRow.querySelector('span');
+                if (isChecked) {
+                    text.classList.add('line-through', 'text-slate-400', 'print-checked-text');
+                    text.classList.remove('text-slate-600');
+                } else {
+                    text.classList.remove('line-through', 'text-slate-400', 'print-checked-text');
+                    text.classList.add('text-slate-600');
+                }
+            }
+
+            saveStateToCloud();
+            updateDailyPercentages();
+        }
+
+        function updateStats() {
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            const activeUserCompletions = window.completions[window.activeParticipant] || {};
+            let activePoints = 0;
+            const maxActivePoints = totalDays * window.habits.length;
+
+            for (let d = 1; d <= totalDays; d++) {
+                const dString = formatDateKey(year, month, d);
+                const dayLogs = activeUserCompletions[dString] || {};
+                window.habits.forEach(h => {
+                    if (dayLogs[h] === true) activePoints++;
+                });
+            }
+
+            const activePercentage = maxActivePoints > 0 ? Math.round((activePoints / maxActivePoints) * 100) : 0;
+            
+            document.getElementById('completionPercentage').textContent = `${activePercentage}%`;
+            document.getElementById('printStats').textContent = `Completion: ${activePercentage}%`;
+            document.getElementById('headerProgressBar').style.width = `${activePercentage}%`;
+
+            const leaderboardContainer = document.getElementById('leaderboardContainer');
+            leaderboardContainer.innerHTML = '';
+
+            window.participants.forEach(person => {
+                const personCompletions = window.completions[person] || {};
+                let pts = 0;
+                const maxPts = totalDays * window.habits.length;
+
+                for (let d = 1; d <= totalDays; d++) {
+                    const dString = formatDateKey(year, month, d);
+                    const dayLogs = personCompletions[dString] || {};
+                    window.habits.forEach(h => {
+                        if (dayLogs[h] === true) pts++;
+                    });
+                }
+
+                const pct = maxPts > 0 ? Math.round((pts / maxPts) * 100) : 0;
+                const isFocused = (person === window.activeParticipant);
+
+                const item = document.createElement('div');
+                item.className = `p-2.5 rounded-xl border transition ${isFocused ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50 border-slate-100'}`;
+                item.innerHTML = `
+                    <div class="flex justify-between items-center text-xs mb-1 font-semibold">
+                        <span class="truncate max-w-[120px] ${isFocused ? 'text-indigo-900 font-extrabold' : 'text-slate-700'}">${person}</span>
+                        <span class="text-slate-500 font-bold">${pts}/${maxPts} checkmarks (${pct}%)</span>
+                    </div>
+                    <div class="w-full bg-slate-200/60 h-2 rounded-full overflow-hidden">
+                        <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                leaderboardContainer.appendChild(item);
+            });
+
+            updateDailyPercentages();
+        }
+
+        function updateDailyPercentages() {
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const activeUserCompletions = window.completions[window.activeParticipant] || {};
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dayString = formatDateKey(year, month, day);
+                const dayCompletions = activeUserCompletions[dayString] || {};
+                
+                let count = 0;
+                window.habits.forEach(h => {
+                    if (dayCompletions[h] === true) count++;
+                });
+
+                const pctSpan = document.getElementById(`pct-${dayString}`);
+                if (pctSpan) {
+                    if (window.habits.length > 0 && count > 0) {
+                        pctSpan.textContent = `${count}/${window.habits.length}`;
+                        pctSpan.className = "text-[9px] font-extrabold text-indigo-600 bg-indigo-50 border border-indigo-100 px-1 rounded-md no-print";
+                    } else {
+                        pctSpan.textContent = '';
+                        pctSpan.className = "hidden no-print";
+                    }
+                }
+            }
+        }
+
+        function renderHabitsList() {
+            const list = document.getElementById('habitsList');
+            const habitsCount = document.getElementById('habitsCount');
+            list.innerHTML = '';
+            
+            habitsCount.textContent = window.habits.length;
+
+            if (window.habits.length === 0) {
+                list.innerHTML = `
+                    <li class="text-xs text-center text-slate-400 py-6 border border-dashed border-slate-200 rounded-xl bg-slate-50/50">
+                        No habits configured. Create your first tracking goal below!
+                    </li>
+                `;
+                return;
+            }
+
+            window.habits.forEach((habit, index) => {
+                const li = document.createElement('li');
+                li.className = "flex items-center justify-between gap-2 p-2 bg-slate-50/50 border border-slate-100 rounded-xl hover:bg-slate-50 transition";
+                
+                const span = document.createElement('span');
+                span.className = "text-xs font-semibold text-slate-700 truncate pr-2";
+                span.textContent = habit;
+                span.title = habit;
+                li.appendChild(span);
+
+                const deleteBtn = document.createElement('button');
+                deleteBtn.type = 'button';
+                deleteBtn.className = "text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-white border border-transparent hover:border-slate-100 transition cursor-pointer";
+                deleteBtn.title = `Delete "${habit}"`;
+                deleteBtn.onclick = () => removeHabit(index, habit);
+                deleteBtn.innerHTML = `<i class="fa-solid fa-trash-can text-xs"></i>`;
+                li.appendChild(deleteBtn);
+
+                list.appendChild(li);
+            });
+        }
+
+        window.addHabit = function(event) {
+            event.preventDefault();
+            const input = document.getElementById('newHabitName');
+            const value = input.value.trim();
+
+            if (!value) return;
+
+            if (window.habits.some(h => h.toLowerCase() === value.toLowerCase())) {
+                showToast("You are already tracking that habit!", "fa-circle-exclamation");
+                input.value = '';
+                return;
+            }
+
+            window.habits.push(value);
+            input.value = '';
+
+            saveStateToCloud();
+            renderAll();
+            showToast(`Added custom habit: "${value}"`, "fa-circle-plus");
+        }
+
+        function removeHabit(index, habitName) {
+            window.habits.splice(index, 1);
+            
+            window.participants.forEach(person => {
+                if (window.completions[person]) {
+                    Object.keys(window.completions[person]).forEach(dateStr => {
+                        if (window.completions[person][dateStr][habitName] !== undefined) {
+                            delete window.completions[person][dateStr][habitName];
+                        }
+                        if (Object.keys(window.completions[person][dateStr]).length === 0) {
+                            delete window.completions[person][dateStr];
+                        }
+                    });
+                }
+            });
+
+            saveStateToCloud();
+            renderAll();
+            showToast(`Deleted habit: "${habitName}"`, "fa-trash-can");
+        }
+
+        window.changeDate = function() {
+            const monthVal = parseInt(document.getElementById('monthSelect').value);
+            const yearVal = parseInt(document.getElementById('yearSelect').value);
+            
+            window.currentDate = new Date(yearVal, monthVal, 1);
+            renderAll();
+        }
+
+        window.navigateMonth = function(direction) {
+            window.currentDate.setMonth(window.currentDate.getMonth() + direction);
+            window.syncDateSelectors();
+            renderAll();
+        }
+
+        window.goToCurrentMonth = function() {
+            window.currentDate = new Date();
+            window.syncDateSelectors();
+            renderAll();
+        }
+
+        window.triggerResetConfirmModal = function() {
+            const overlay = document.getElementById('modalOverlay');
+            const box = document.getElementById('modalBox');
+            
+            overlay.classList.remove('hidden');
+            setTimeout(() => {
+                box.classList.remove('scale-95', 'opacity-0');
+                box.classList.add('scale-100', 'opacity-100');
+            }, 50);
+        }
+
+        window.closeConfirmModal = function() {
+            const overlay = document.getElementById('modalOverlay');
+            const box = document.getElementById('modalBox');
+            
+            box.classList.remove('scale-100', 'opacity-100');
+            box.classList.add('scale-95', 'opacity-0');
+            setTimeout(() => {
+                overlay.classList.add('hidden');
+            }, 200);
+        }
+
+        window.executeReset = function() {
+            window.completions = {};
+            window.bodyMetrics = {};
+            window.habits = ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
+            window.participants = ['Emily', 'Dad', 'Stephanie'];
+            window.activeParticipant = 'Emily';
+            
+            saveStateToCloud();
+            renderAll();
+            closeConfirmModal();
+            showToast("Tracker has been restored to default settings.", "fa-trash-can");
+        }
+
+        function showToast(message, iconName = 'fa-circle-check') {
+            const banner = document.getElementById('notificationBanner');
+            const text = document.getElementById('notifMessage');
+            const icon = document.getElementById('notifIcon');
+
+            text.textContent = message;
+            icon.innerHTML = `<i class="fa-solid ${iconName}"></i>`;
+
+            banner.classList.remove('opacity-0', 'translate-y-24', 'pointer-events-none');
+            banner.classList.add('opacity-100', 'translate-y-0');
+
+            setTimeout(() => {
+                banner.classList.add('opacity-0', 'translate-y-24', 'pointer-events-none');
+                banner.classList.remove('opacity-100', 'translate-y-0');
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
