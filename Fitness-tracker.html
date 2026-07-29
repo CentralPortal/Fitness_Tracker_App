@@ -19,7 +19,7 @@
             background-color: #f8fafc;
         }
 
-        /* Custom Scrollbar for nicer UI */
+        /* Custom Scrollbar */
         ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
@@ -37,13 +37,63 @@
 
         /* Custom Checkbox Design */
         .habit-checkbox {
-            position: relative;
+            appearance: none;
+            -webkit-appearance: none;
+            width: 16px;
+            height: 16px;
+            border-radius: 4px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease;
+            position: relative;
+            outline: none;
+            flex-shrink: 0;
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
         }
 
+        /* Unchecked Habit State: Red Background with White 'X' */
+        .habit-checkbox:not(:checked) {
+            background-color: #ef4444;
+            border: 1px solid #dc2626;
+        }
+
+        .habit-checkbox:not(:checked)::after {
+            content: "✕";
+            color: #ffffff;
+            font-size: 10px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        /* Checked Habit State: Green Background with White Checkmark */
         .habit-checkbox:checked {
+            background-color: #10b981;
+            border: 1px solid #059669;
             animation: pop 0.2s ease-in-out;
+        }
+
+        .habit-checkbox:checked::after {
+            content: "✓";
+            color: #ffffff;
+            font-size: 11px;
+            font-weight: 900;
+            line-height: 1;
+        }
+
+        /* Custom checked text: No line-through, emerald green text */
+        .habit-checkbox:checked + .habit-label-text {
+            text-decoration: none !important;
+            color: #059669 !important;
+            font-weight: 700;
+        }
+
+        .habit-checkbox:not(:checked) + .habit-label-text {
+            text-decoration: none !important;
+            color: #334155;
+            font-weight: 500;
         }
 
         @keyframes pop {
@@ -60,12 +110,10 @@
                 font-size: 10pt;
             }
             
-            /* Hide UI Elements */
             .no-print {
                 display: none !important;
             }
 
-            /* Container Adjustments */
             .print-container {
                 width: 100% !important;
                 max-width: 100% !important;
@@ -74,7 +122,6 @@
                 box-shadow: none !important;
             }
 
-            /* Grid Layout for Portrait or Landscape standard printing */
             .calendar-grid-header {
                 display: grid !important;
                 grid-template-columns: repeat(7, 1fr) !important;
@@ -93,7 +140,6 @@
                 gap: 0 !important;
             }
 
-            /* Cells standard printable border */
             .day-cell {
                 border-right: 1px solid #cbd5e1 !important;
                 border-bottom: 1px solid #cbd5e1 !important;
@@ -109,21 +155,6 @@
                 border-right: none !important;
             }
 
-            /* Highlight checked items beautifully for printers */
-            .print-checked-text {
-                text-decoration: line-through !important;
-                color: #64748b !important;
-            }
-
-            .print-checked-checkbox {
-                border-color: #000000 !important;
-                background-color: #000000 !important;
-                color: white !important;
-                -webkit-print-color-adjust: exact;
-                print-color-adjust: exact;
-            }
-
-            /* Header configuration */
             .print-header {
                 display: flex !important;
                 justify-content: space-between !important;
@@ -131,7 +162,6 @@
                 margin-bottom: 15px !important;
             }
 
-            /* Auto landscape options */
             @page {
                 size: landscape;
                 margin: 0.4in;
@@ -159,9 +189,9 @@
             <div class="flex flex-wrap items-center gap-2">
                 <!-- Status Badge -->
                 <div id="cloudStatusBadge">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 rounded-full">
-                        <span class="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
-                        Syncing...
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Ready (Local)
                     </span>
                 </div>
                 <!-- View Switcher Tabs -->
@@ -173,7 +203,7 @@
                         <i class="fa-solid fa-chart-line"></i> Dashboard
                     </button>
                 </div>
-                <!-- Fixed Print Trigger Button -->
+                <!-- Print Trigger Button -->
                 <button onclick="triggerPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2 px-4 rounded-xl shadow-lg shadow-indigo-100 transition duration-150 flex items-center gap-2 cursor-pointer">
                     <i class="fa-solid fa-print"></i>
                     <span>Print Tracker</span>
@@ -189,7 +219,7 @@
     <!-- MAIN BODY -->
     <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6 print-container">
         
-        <!-- LEFT SIDE PANEL (no-print) -->
+        <!-- LEFT SIDE PANEL -->
         <aside class="w-full lg:w-80 flex flex-col gap-6 no-print shrink-0">
             
             <!-- PARTICIPANT SELECTION SYSTEM -->
@@ -202,7 +232,7 @@
                 
                 <!-- Participant Buttons Selector -->
                 <div id="participantButtons" class="space-y-2 mb-4">
-                    <!-- Loaded dynamically via JS -->
+                    <!-- Populated dynamically via JS -->
                 </div>
 
                 <!-- Add Participant Form -->
@@ -210,7 +240,7 @@
                     <label for="newParticipantName" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Add Participant</label>
                     <div class="flex gap-2">
                         <input type="text" id="newParticipantName" placeholder="e.g. Mom" max="20" class="flex-grow bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
-                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm" title="Add Participant">
+                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm cursor-pointer" title="Add Participant">
                             <i class="fa-solid fa-plus font-bold"></i>
                         </button>
                     </div>
@@ -282,13 +312,13 @@
                 </div>
 
                 <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <button onclick="navigateMonth(-1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200" title="Previous Month">
+                    <button onclick="navigateMonth(-1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200 cursor-pointer" title="Previous Month">
                         <i class="fa-solid fa-chevron-left"></i>
                     </button>
-                    <button onclick="goToCurrentMonth()" class="px-4 py-2 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200 flex-1 flex justify-center">
+                    <button onclick="goToCurrentMonth()" class="px-4 py-2 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200 flex-1 flex justify-center cursor-pointer">
                         Today
                     </button>
-                    <button onclick="navigateMonth(1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200" title="Next Month">
+                    <button onclick="navigateMonth(1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200 cursor-pointer" title="Next Month">
                         <i class="fa-solid fa-chevron-right"></i>
                     </button>
                 </div>
@@ -314,7 +344,7 @@
                     <label for="newHabitName" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Add Custom Habit</label>
                     <div class="flex gap-2">
                         <input type="text" id="newHabitName" placeholder="e.g. Read 15 mins" max="30" class="flex-grow bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
-                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm" title="Add Habit">
+                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm cursor-pointer" title="Add Habit">
                             <i class="fa-solid fa-plus font-bold"></i>
                         </button>
                     </div>
@@ -340,7 +370,7 @@
             <!-- Custom Banner shown only in Printout -->
             <div class="hidden print-header flex justify-between items-center border-b-2 border-slate-900 pb-3">
                 <div>
-                    <h2 id="printTitle" class="text-2xl font-black uppercase text-slate-900 tracking-tight">Emily's Habit Tracker - July 2026</h2>
+                    <h2 id="printTitle" class="text-2xl font-black uppercase text-slate-900 tracking-tight">Emily's Habit Tracker</h2>
                     <p class="text-xs font-semibold text-slate-500">Monthly Performance Grid & Daily Consistency Log</p>
                 </div>
                 <div class="text-right">
@@ -398,7 +428,7 @@
                         <i class="fa-solid fa-circle-info text-indigo-500 text-lg"></i>
                     </div>
                     <div class="text-xs text-slate-600 leading-relaxed">
-                        <strong>Tip:</strong> Select a participant in the sidebar to log items for them. Click "Print Tracker" above to print a formatted page.
+                        <strong>Tip:</strong> Select a participant in the sidebar to log items for them. Click "Print Tracker" above to print a formatted page. Unchecked habits show a red ✕ box; checked habits show a green ✓ box with emerald green text (no strikethrough).
                     </div>
                 </div>
             </div>
@@ -502,57 +532,151 @@
         <span id="notifMessage" class="text-sm font-semibold">Action completed successfully.</span>
     </div>
 
-    <!-- FIREBASE SDK & APP CONFIGURATION -->
+    <!-- JAVASCRIPT APPLICATION LOGIC -->
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
         import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
         import { getFirestore, doc, setDoc, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
 
-        // Environment Variables Configuration
+        /* State Variables & Constants */
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'family-habit-tracker';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
-        // Application State Configuration
         let db = null;
         let auth = null;
         let userId = 'local-user';
         let isSaving = false;
 
-        // Chart Instance Holds
         let bodyChartInstance = null;
         let consistencyChartInstance = null;
         let breakdownChartInstance = null;
 
-        // Global State Variables
         window.currentDate = new Date();
-        window.activeMainView = 'calendar'; // 'calendar' or 'dashboard'
+        window.activeMainView = 'calendar';
         window.habits = ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
         window.participants = ['Emily', 'Dad', 'Stephanie'];
         window.activeParticipant = 'Emily';
-        window.completions = {}; // Schema: { participant: { dateString: { habit: boolean } } }
-        window.bodyMetrics = {}; // Schema: { participant: { dateString: { weight: number, tummy: number } } }
+        window.completions = {};
+        window.bodyMetrics = {};
 
         const MONTH_NAMES = [
             "January", "February", "March", "April", "May", "June",
             "July", "August", "September", "October", "November", "December"
         ];
 
-        // Explicit focus handler to make sure printing works smoothly inside iframe/webviews
+        /* Helper Functions */
+        function formatDateKey(year, month, day) {
+            const m = String(month + 1).padStart(2, '0');
+            const d = String(day).padStart(2, '0');
+            return `${year}-${m}-${d}`;
+        }
+
+        window.showToast = function(message, iconClass = "fa-circle-check") {
+            const banner = document.getElementById('notificationBanner');
+            const notifMsg = document.getElementById('notifMessage');
+            const notifIcon = document.getElementById('notifIcon');
+
+            if (banner && notifMsg && notifIcon) {
+                notifMsg.textContent = message;
+                notifIcon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
+                banner.classList.remove('translate-y-24', 'opacity-0');
+
+                setTimeout(() => {
+                    banner.classList.add('translate-y-24', 'opacity-0');
+                }, 3000);
+            }
+        };
+
+        function updateCloudStatusBadge(isOnline) {
+            const badge = document.getElementById('cloudStatusBadge');
+            if (!badge) return;
+
+            if (isOnline) {
+                badge.innerHTML = `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                        Cloud Synced
+                    </span>
+                `;
+            } else {
+                badge.innerHTML = `
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 rounded-full">
+                        <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
+                        Local Safe Mode
+                    </span>
+                `;
+            }
+        }
+
+        /* Local Storage Persistence */
+        function loadFallbackLocalState() {
+            try {
+                const saved = localStorage.getItem('family_habit_tracker_state');
+                if (saved) {
+                    const parsed = JSON.parse(saved);
+                    window.habits = parsed.habits || ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
+                    window.participants = parsed.participants || ['Emily', 'Dad', 'Stephanie'];
+                    window.activeParticipant = parsed.activeParticipant || 'Emily';
+                    window.completions = parsed.completions || {};
+                    window.bodyMetrics = parsed.bodyMetrics || {};
+                }
+            } catch (e) {
+                console.warn("Could not load from localStorage:", e);
+            }
+        }
+
+        function saveFallbackLocalState() {
+            try {
+                const state = {
+                    habits: window.habits,
+                    participants: window.participants,
+                    activeParticipant: window.activeParticipant,
+                    completions: window.completions,
+                    bodyMetrics: window.bodyMetrics
+                };
+                localStorage.setItem('family_habit_tracker_state', JSON.stringify(state));
+            } catch (e) {
+                console.warn("Could not save to localStorage:", e);
+            }
+        }
+
+        async function saveStateToCloud() {
+            saveFallbackLocalState();
+
+            if (!db || !userId || userId === 'local-user') return;
+
+            isSaving = true;
+            try {
+                const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'trackerState');
+                await setDoc(docRef, {
+                    habits: window.habits,
+                    participants: window.participants,
+                    activeParticipant: window.activeParticipant,
+                    completions: window.completions,
+                    bodyMetrics: window.bodyMetrics,
+                    updatedAt: new Date().toISOString()
+                }, { merge: true });
+            } catch (err) {
+                console.warn("Save to Firestore failed, stored locally instead.", err);
+            } finally {
+                setTimeout(() => { isSaving = false; }, 500);
+            }
+        }
+
+        /* Print Tracker Functionality */
         window.triggerPrint = function() {
             try {
                 window.focus();
                 
-                // Try direct printing first
                 let directSuccess = false;
                 try {
                     window.print();
                     directSuccess = true;
                 } catch (e) {
-                    console.warn("Direct window.print() unavailable or blocked, falling back to printable window.", e);
+                    console.warn("Direct window.print() failed, launching popup print document.", e);
                 }
 
-                // If direct print didn't launch or in iframe context, also open standalone printable window
                 if (!directSuccess || window.self !== window.top) {
                     window.openPrintableTab();
                 } else {
@@ -565,57 +689,54 @@
         };
 
         window.openPrintableTab = function() {
-            const year = window.currentDate.getFullYear();
-            const month = window.currentDate.getMonth();
-            const monthName = MONTH_NAMES[month];
-            const activePerson = window.activeParticipant;
-            const userCompletions = window.completions[activePerson] || {};
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            const firstDayIndex = new Date(year, month, 1).getDay();
+            try {
+                const year = window.currentDate.getFullYear();
+                const month = window.currentDate.getMonth();
+                const monthName = MONTH_NAMES[month];
+                const activePerson = window.activeParticipant;
+                const userCompletions = window.completions[activePerson] || {};
+                const totalDays = new Date(year, month + 1, 0).getDate();
+                const firstDayIndex = new Date(year, month, 1).getDay();
 
-            // Calculate active completion stats
-            let completedCount = 0;
-            const totalPossible = totalDays * window.habits.length;
-            for (let d = 1; d <= totalDays; d++) {
-                const dStr = formatDateKey(year, month, d);
-                const dayData = userCompletions[dStr] || {};
-                window.habits.forEach(h => { if (dayData[h]) completedCount++; });
-            }
-            const pct = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
+                let completedCount = 0;
+                const totalPossible = totalDays * window.habits.length;
+                for (let d = 1; d <= totalDays; d++) {
+                    const dStr = formatDateKey(year, month, d);
+                    const dayData = userCompletions[dStr] || {};
+                    window.habits.forEach(h => { if (dayData[h]) completedCount++; });
+                }
+                const pct = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
 
-            // Generate grid cells
-            let gridCellsHtml = '';
-            
-            // Trailing empty days from previous month
-            for (let i = 0; i < firstDayIndex; i++) {
-                gridCellsHtml += `<div class="cell empty"></div>`;
-            }
-
-            // Month days
-            for (let d = 1; d <= totalDays; d++) {
-                const dStr = formatDateKey(year, month, d);
-                const dayLogs = userCompletions[dStr] || {};
+                let gridCellsHtml = '';
                 
-                let habitsHtml = '';
-                window.habits.forEach(h => {
-                    const checked = !!dayLogs[h];
-                    habitsHtml += `
-                        <div class="habit-item ${checked ? 'checked' : ''}">
-                            <span class="box">${checked ? '✓' : ''}</span>
-                            <span class="habit-name">${h}</span>
+                for (let i = 0; i < firstDayIndex; i++) {
+                    gridCellsHtml += `<div class="cell empty"></div>`;
+                }
+
+                for (let d = 1; d <= totalDays; d++) {
+                    const dStr = formatDateKey(year, month, d);
+                    const dayLogs = userCompletions[dStr] || {};
+                    
+                    let habitsHtml = '';
+                    window.habits.forEach(h => {
+                        const checked = !!dayLogs[h];
+                        habitsHtml += `
+                            <div class="habit-item ${checked ? 'checked' : ''}">
+                                <span class="box ${checked ? 'box-checked' : 'box-unchecked'}">${checked ? '✓' : '✕'}</span>
+                                <span class="habit-name">${h}</span>
+                            </div>
+                        `;
+                    });
+
+                    gridCellsHtml += `
+                        <div class="cell">
+                            <div class="day-num">${d}</div>
+                            <div class="habits-container">${habitsHtml}</div>
                         </div>
                     `;
-                });
+                }
 
-                gridCellsHtml += `
-                    <div class="cell">
-                        <div class="day-num">${d}</div>
-                        <div class="habits-container">${habitsHtml}</div>
-                    </div>
-                `;
-            }
-
-            const printHtml = `
+                const printHtml = `
             <!DOCTYPE html>
             <html>
             <head>
@@ -629,7 +750,7 @@
                     .print-btn:hover { background: #4338ca; }
 
                     .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px; }
-                    .header h1 { margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase; tracking: -0.02em; }
+                    .header h1 { margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; }
                     .header p { margin: 2px 0 0 0; font-size: 11px; color: #64748b; }
                     .stats { text-align: right; font-size: 13px; font-weight: 700; color: #4f46e5; }
 
@@ -641,9 +762,11 @@
 
                     .habits-container { display: flex; flex-direction: column; gap: 3px; }
                     .habit-item { display: flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 500; color: #334155; }
-                    .habit-item.checked { text-decoration: line-through; color: #94a3b8; }
-                    .box { display: inline-flex; align-items: center; justify-content: center; width: 11px; height: 11px; border: 1px solid #64748b; font-size: 8px; font-weight: bold; border-radius: 2px; line-height: 1; }
-                    .habit-item.checked .box { background: #0f172a; color: #fff; border-color: #0f172a; }
+                    .habit-item.checked .habit-name { text-decoration: none; color: #059669; font-weight: 700; }
+                    
+                    .box { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; color: #fff; font-size: 8px; font-weight: bold; border-radius: 2px; line-height: 1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+                    .box-unchecked { background: #ef4444; border: 1px solid #dc2626; }
+                    .box-checked { background: #10b981; border: 1px solid #059669; }
 
                     @media print { 
                         .no-print-bar { display: none !important; }
@@ -682,14 +805,12 @@
             </html>
             `;
 
-            try {
                 const printWin = window.open('', '_blank');
                 if (printWin) {
                     printWin.document.open();
                     printWin.document.write(printHtml);
                     printWin.document.close();
                 } else {
-                    showToast("Popup blocked. Press Ctrl+P or Cmd+P.", "fa-circle-exclamation");
                     window.print();
                 }
             } catch (e) {
@@ -698,6 +819,7 @@
             }
         };
 
+        /* View Switcher */
         window.switchMainView = function(viewName) {
             window.activeMainView = viewName;
             const calSec = document.getElementById('calendarViewSection');
@@ -717,8 +839,122 @@
                 calBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5";
                 renderDashboardCharts();
             }
+        };
+
+        /* Participant Selection & Management */
+        window.selectParticipant = function(name) {
+            window.activeParticipant = name;
+            renderAll();
+            showToast(`Switched view to ${name}`, "fa-user");
+        };
+
+        window.addParticipant = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('newParticipantName');
+            const name = input.value.trim();
+            if (!name) return;
+
+            if (window.participants.includes(name)) {
+                showToast(`${name} already exists!`, "fa-triangle-exclamation");
+                return;
+            }
+
+            window.participants.push(name);
+            window.activeParticipant = name;
+            input.value = '';
+            saveStateToCloud();
+            renderAll();
+            showToast(`Added ${name} to participants!`, "fa-user-plus");
+        };
+
+        /* Habits List Management */
+        window.addHabit = function(e) {
+            e.preventDefault();
+            const input = document.getElementById('newHabitName');
+            const habit = input.value.trim();
+            if (!habit) return;
+
+            if (window.habits.includes(habit)) {
+                showToast(`${habit} already in habits list!`, "fa-triangle-exclamation");
+                return;
+            }
+
+            window.habits.push(habit);
+            input.value = '';
+            saveStateToCloud();
+            renderAll();
+            showToast(`Added habit: ${habit}`, "fa-plus");
+        };
+
+        window.removeHabit = function(habitName) {
+            window.habits = window.habits.filter(h => h !== habitName);
+            saveStateToCloud();
+            renderAll();
+            showToast(`Removed habit: ${habitName}`, "fa-trash");
+        };
+
+        /* Calendar Date Control */
+        function populateYearSelect() {
+            const yearSelect = document.getElementById('yearSelect');
+            if (!yearSelect) return;
+            yearSelect.innerHTML = '';
+            const currentYear = new Date().getFullYear();
+            for (let y = currentYear - 2; y <= currentYear + 5; y++) {
+                const opt = document.createElement('option');
+                opt.value = y;
+                opt.textContent = y;
+                yearSelect.appendChild(opt);
+            }
         }
 
+        function syncDateSelectors() {
+            const mSel = document.getElementById('monthSelect');
+            const ySel = document.getElementById('yearSelect');
+            if (mSel) mSel.value = window.currentDate.getMonth();
+            if (ySel) ySel.value = window.currentDate.getFullYear();
+        }
+
+        window.changeDate = function() {
+            const mSel = document.getElementById('monthSelect');
+            const ySel = document.getElementById('yearSelect');
+            if (mSel && ySel) {
+                window.currentDate.setMonth(parseInt(mSel.value));
+                window.currentDate.setFullYear(parseInt(ySel.value));
+                renderAll();
+            }
+        };
+
+        window.navigateMonth = function(delta) {
+            window.currentDate.setMonth(window.currentDate.getMonth() + delta);
+            syncDateSelectors();
+            renderAll();
+        };
+
+        window.goToCurrentMonth = function() {
+            window.currentDate = new Date();
+            syncDateSelectors();
+            renderAll();
+        };
+
+        /* Checkbox Habit Toggle */
+        window.toggleHabitCompletion = function(dateStr, habitName) {
+            const p = window.activeParticipant;
+            if (!window.completions[p]) window.completions[p] = {};
+            if (!window.completions[p][dateStr]) window.completions[p][dateStr] = {};
+
+            const current = !!window.completions[p][dateStr][habitName];
+            window.completions[p][dateStr][habitName] = !current;
+
+            saveStateToCloud();
+            renderCalendarHeaderStats();
+            renderLeaderboard();
+            
+            if (window.activeMainView === 'dashboard') {
+                renderDashboardCharts();
+            }
+        };
+
+        /* Body Metrics Logging */
         window.saveBodyMetrics = function(e) {
             e.preventDefault();
             const dateVal = document.getElementById('metricDate').value;
@@ -726,7 +962,7 @@
             const tummyVal = parseFloat(document.getElementById('metricTummy').value);
 
             if (!dateVal || isNaN(weightVal) || isNaN(tummyVal)) {
-                showToast("Please fill in valid date, weight, and tummy measurements.", "fa-circle-exclamation");
+                showToast("Please enter valid weight and tummy measurements.", "fa-circle-exclamation");
                 return;
             }
 
@@ -742,15 +978,218 @@
             saveStateToCloud();
             showToast(`Logged body metrics for ${window.activeParticipant}!`, "fa-weight-scale");
 
-            // Reset inputs
             document.getElementById('metricWeight').value = '';
             document.getElementById('metricTummy').value = '';
 
             if (window.activeMainView === 'dashboard') {
                 renderDashboardCharts();
             }
+        };
+
+        /* UI Render Routines */
+        function renderAll() {
+            renderParticipantButtons();
+            renderHabitsList();
+            renderCalendar();
+            renderCalendarHeaderStats();
+            renderLeaderboard();
+
+            const badge = document.getElementById('activePersonMetricLabel');
+            if (badge) badge.textContent = window.activeParticipant;
+
+            if (window.activeMainView === 'dashboard') {
+                renderDashboardCharts();
+            }
         }
 
+        function renderParticipantButtons() {
+            const container = document.getElementById('participantButtons');
+            if (!container) return;
+            container.innerHTML = '';
+
+            window.participants.forEach(p => {
+                const isActive = p === window.activeParticipant;
+                const btn = document.createElement('button');
+                btn.type = 'button';
+                btn.onclick = () => window.selectParticipant(p);
+                btn.className = `w-full text-left px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-between transition cursor-pointer ${
+                    isActive 
+                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
+                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
+                }`;
+
+                btn.innerHTML = `
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-circle-user text-sm"></i>
+                        <span>${p}</span>
+                    </span>
+                    ${isActive ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
+                `;
+                container.appendChild(btn);
+            });
+        }
+
+        function renderHabitsList() {
+            const container = document.getElementById('habitsList');
+            const countBadge = document.getElementById('habitsCount');
+            if (!container) return;
+
+            if (countBadge) countBadge.textContent = window.habits.length;
+            container.innerHTML = '';
+
+            if (window.habits.length === 0) {
+                container.innerHTML = `<li class="text-xs text-slate-400 italic py-2">No habits added yet.</li>`;
+                return;
+            }
+
+            window.habits.forEach(h => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700';
+                li.innerHTML = `
+                    <span class="truncate">${h}</span>
+                    <button onclick="removeHabit('${h}')" class="text-slate-400 hover:text-rose-500 transition p-1 cursor-pointer" title="Delete Habit">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarDaysGrid');
+            if (!grid) return;
+            grid.innerHTML = '';
+
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+
+            const monthTitle = `${MONTH_NAMES[month]} ${year}`;
+            const headerTitle = document.getElementById('calendarHeaderTitle');
+            const headerBadge = document.getElementById('headerParticipantBadge');
+            
+            if (headerTitle) headerTitle.textContent = monthTitle;
+            if (headerBadge) headerBadge.textContent = window.activeParticipant.toUpperCase();
+
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            const p = window.activeParticipant;
+            const pCompletions = window.completions[p] || {};
+
+            // Empty padding days for preceding month
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'bg-slate-50/50 border border-slate-100 rounded-xl p-2 min-h-[110px] print:bg-white print:border-slate-200';
+                grid.appendChild(emptyCell);
+            }
+
+            const today = new Date();
+            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
+
+            for (let day = 1; day <= totalDays; day++) {
+                const dateStr = formatDateKey(year, month, day);
+                const isToday = isCurrentMonth && today.getDate() === day;
+
+                const dayCell = document.createElement('div');
+                dayCell.className = `day-cell bg-white border rounded-xl p-2 sm:p-2.5 flex flex-col justify-between min-h-[115px] transition hover:border-slate-300 ${
+                    isToday ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm' : 'border-slate-200'
+                }`;
+
+                let habitsMarkup = '';
+                const dayLogs = pCompletions[dateStr] || {};
+
+                window.habits.forEach(h => {
+                    const isChecked = !!dayLogs[h];
+                    habitsMarkup += `
+                        <label class="flex items-center gap-1.5 cursor-pointer select-none group">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleHabitCompletion('${dateStr}', '${h}')" class="habit-checkbox">
+                            <span class="habit-label-text text-[10px] sm:text-xs truncate transition-colors">${h}</span>
+                        </label>
+                    `;
+                });
+
+                dayCell.innerHTML = `
+                    <div class="flex items-center justify-between mb-1.5">
+                        <span class="text-xs font-extrabold ${isToday ? 'bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center' : 'text-slate-800'}">${day}</span>
+                        ${isToday ? '<span class="text-[9px] font-bold text-indigo-600 uppercase tracking-wider">Today</span>' : ''}
+                    </div>
+                    <div class="space-y-1.5 flex-grow overflow-y-auto">
+                        ${habitsMarkup}
+                    </div>
+                `;
+
+                grid.appendChild(dayCell);
+            }
+        }
+
+        function renderCalendarHeaderStats() {
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            const p = window.activeParticipant;
+            const pCompletions = window.completions[p] || {};
+
+            let done = 0;
+            const totalPossible = totalDays * window.habits.length;
+
+            for (let d = 1; d <= totalDays; d++) {
+                const dateStr = formatDateKey(year, month, d);
+                const dayLogs = pCompletions[dateStr] || {};
+                window.habits.forEach(h => {
+                    if (dayLogs[h]) done++;
+                });
+            }
+
+            const pct = totalPossible > 0 ? Math.round((done / totalPossible) * 100) : 0;
+
+            const pctText = document.getElementById('completionPercentage');
+            const progressBar = document.getElementById('headerProgressBar');
+
+            if (pctText) pctText.textContent = `${pct}%`;
+            if (progressBar) progressBar.style.width = `${pct}%`;
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardContainer');
+            if (!container) return;
+            container.innerHTML = '';
+
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const totalPossible = totalDays * window.habits.length;
+
+            window.participants.forEach(p => {
+                const pCompletions = window.completions[p] || {};
+                let done = 0;
+
+                for (let d = 1; d <= totalDays; d++) {
+                    const dateStr = formatDateKey(year, month, d);
+                    const dayLogs = pCompletions[dateStr] || {};
+                    window.habits.forEach(h => {
+                        if (dayLogs[h]) done++;
+                    });
+                }
+
+                const pct = totalPossible > 0 ? Math.round((done / totalPossible) * 100) : 0;
+
+                const row = document.createElement('div');
+                row.className = 'bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5';
+                row.innerHTML = `
+                    <div class="flex items-center justify-between text-xs font-bold">
+                        <span class="text-slate-800">${p}</span>
+                        <span class="text-indigo-600">${pct}% (${done}/${totalPossible})</span>
+                    </div>
+                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
+                        <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
+                    </div>
+                `;
+                container.appendChild(row);
+            });
+        }
+
+        /* Chart Rendering */
         window.renderDashboardCharts = function() {
             const title = document.getElementById('dashParticipantTitle');
             if (title) title.textContent = `${window.activeParticipant}'s Progress & Metrics Dashboard`;
@@ -764,7 +1203,7 @@
             const countBadge = document.getElementById('dashMetricCount');
             if (countBadge) countBadge.textContent = `${loggedDates.length} body logs`;
 
-            // CHART 1: Body Metrics Dual Axis Line Chart
+            // CHART 1: Dual Axis Body Metrics
             const ctxBody = document.getElementById('bodyMetricsChart')?.getContext('2d');
             if (ctxBody) {
                 if (bodyChartInstance) bodyChartInstance.destroy();
@@ -906,26 +1345,68 @@
                     }
                 });
             }
-        }
+        };
 
-        // INITIALIZATION ROUTINE
+        /* Reset Modal Control */
+        window.triggerResetConfirmModal = function() {
+            const modal = document.getElementById('modalOverlay');
+            const box = document.getElementById('modalBox');
+            if (modal && box) {
+                modal.classList.remove('hidden');
+                setTimeout(() => {
+                    box.classList.remove('scale-95', 'opacity-0');
+                }, 10);
+            }
+        };
+
+        window.closeConfirmModal = function() {
+            const modal = document.getElementById('modalOverlay');
+            const box = document.getElementById('modalBox');
+            if (modal && box) {
+                box.classList.add('scale-95', 'opacity-0');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+        };
+
+        window.executeReset = function() {
+            window.habits = ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
+            window.participants = ['Emily', 'Dad', 'Stephanie'];
+            window.activeParticipant = 'Emily';
+            window.completions = {};
+            window.bodyMetrics = {};
+
+            saveStateToCloud();
+            closeConfirmModal();
+            renderAll();
+            showToast("System reset to initial state.", "fa-rotate-left");
+        };
+
+        /* Initialization */
         window.onload = function() {
             populateYearSelect();
             syncDateSelectors();
+
             const todayStr = new Date().toISOString().split('T')[0];
             const mInput = document.getElementById('metricDate');
             if (mInput) mInput.value = todayStr;
             
+            loadFallbackLocalState();
+            renderAll();
+
             initFirebase();
-        }
+        };
 
         async function initFirebase() {
             if (!firebaseConfig) {
-                loadFallbackLocalState();
                 updateCloudStatusBadge(false);
-                renderAll();
                 return;
             }
+
+            const connectionTimeout = setTimeout(() => {
+                updateCloudStatusBadge(false);
+            }, 3000);
 
             try {
                 const app = initializeApp(firebaseConfig);
@@ -933,39 +1414,36 @@
                 auth = getAuth(app);
 
                 if (initialAuthToken) {
-                    await signInWithCustomToken(auth, initialAuthToken);
+                    await signInWithCustomToken(auth, initialAuthToken).catch(() => signInAnonymously(auth));
                 } else {
                     await signInAnonymously(auth);
                 }
 
                 onAuthStateChanged(auth, (user) => {
+                    clearTimeout(connectionTimeout);
                     if (user) {
                         userId = user.uid;
-                        updateCloudStatusBadge(true);
                         setupRealtimeSync();
                     } else {
                         userId = 'local-user';
                         updateCloudStatusBadge(false);
-                        loadFallbackLocalState();
-                        renderAll();
                     }
                 });
 
             } catch (err) {
-                console.error("Firebase connection error:", err);
+                clearTimeout(connectionTimeout);
+                console.warn("Firebase running in Local Safe Mode:", err.message || err);
                 updateCloudStatusBadge(false);
-                loadFallbackLocalState();
-                renderAll();
             }
         }
 
-        // REAL-TIME FIRESTORE SYNC
         function setupRealtimeSync() {
             if (!db || !userId || userId === 'local-user') return;
 
             const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'trackerState');
 
             onSnapshot(docRef, (docSnap) => {
+                updateCloudStatusBadge(true);
                 if (isSaving) return;
                 
                 if (docSnap.exists()) {
@@ -984,594 +1462,13 @@
                     window.completions = cloudData.completions || {};
                     window.bodyMetrics = cloudData.bodyMetrics || {};
                 } else {
-                    window.habits = ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
-                    window.participants = ['Emily', 'Dad', 'Stephanie'];
-                    window.activeParticipant = 'Emily';
-                    window.completions = {};
-                    window.bodyMetrics = {};
                     saveStateToCloud();
                 }
                 renderAll();
             }, (error) => {
-                console.error("Realtime sync error:", error);
+                console.warn("Cloud offline, using local storage mode.", error.message);
                 updateCloudStatusBadge(false);
-                loadFallbackLocalState();
-                renderAll();
             });
-        }
-
-        // SAVE STATE
-        async function saveStateToCloud() {
-            updateStats();
-            
-            if (!db || !userId || userId === 'local-user') {
-                saveFallbackLocalState();
-                return;
-            }
-
-            isSaving = true;
-            const docRef = doc(db, 'artifacts', appId, 'users', userId, 'data', 'trackerState');
-            try {
-                await setDoc(docRef, {
-                    habits: window.habits,
-                    participants: window.participants,
-                    activeParticipant: window.activeParticipant,
-                    completions: window.completions,
-                    bodyMetrics: window.bodyMetrics
-                });
-            } catch (err) {
-                console.error("Failed to commit changes:", err);
-                showToast("Save delayed. Re-syncing.", "fa-triangle-exclamation");
-            } finally {
-                isSaving = false;
-            }
-        }
-
-        // LOCAL STORAGE FALLBACK
-        function loadFallbackLocalState() {
-            const raw = localStorage.getItem('family_habits_state_v2');
-            if (raw) {
-                try {
-                    const parsed = JSON.parse(raw);
-                    window.habits = parsed.habits || ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
-                    window.participants = parsed.participants || ['Emily', 'Dad', 'Stephanie'];
-                    window.activeParticipant = parsed.activeParticipant || 'Emily';
-                    window.completions = parsed.completions || {};
-                    window.bodyMetrics = parsed.bodyMetrics || {};
-                } catch (e) {
-                    console.error("Local Storage parse error:", e);
-                }
-            }
-        }
-
-        function saveFallbackLocalState() {
-            const payload = {
-                habits: window.habits,
-                participants: window.participants,
-                activeParticipant: window.activeParticipant,
-                completions: window.completions,
-                bodyMetrics: window.bodyMetrics
-            };
-            localStorage.setItem('family_habits_state_v2', JSON.stringify(payload));
-        }
-
-        // BADGE STATUS
-        function updateCloudStatusBadge(isConnected) {
-            const badge = document.getElementById('cloudStatusBadge');
-            if (isConnected) {
-                badge.innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                        Cloud Auto-Save Active
-                    </span>`;
-            } else {
-                badge.innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-200 rounded-full" title="Active on local browser session.">
-                        <i class="fa-solid fa-circle-check text-slate-500"></i>
-                        Local Safe Mode
-                    </span>`;
-            }
-        }
-
-        function populateYearSelect() {
-            const select = document.getElementById('yearSelect');
-            const currentYear = new Date().getFullYear();
-            for (let y = currentYear - 5; y <= currentYear + 5; y++) {
-                const opt = document.createElement('option');
-                opt.value = y;
-                opt.textContent = y;
-                select.appendChild(opt);
-            }
-        }
-
-        window.syncDateSelectors = function() {
-            document.getElementById('monthSelect').value = window.currentDate.getMonth();
-            document.getElementById('yearSelect').value = window.currentDate.getFullYear();
-        }
-
-        function renderHeaderAndControls() {
-            const year = window.currentDate.getFullYear();
-            const month = window.currentDate.getMonth();
-            const monthName = MONTH_NAMES[month];
-
-            const headerTitle = document.getElementById('calendarHeaderTitle');
-            if (headerTitle) headerTitle.textContent = `${monthName} ${year}`;
-
-            const badge = document.getElementById('headerParticipantBadge');
-            if (badge) badge.textContent = window.activeParticipant.toUpperCase();
-
-            const printTitle = document.getElementById('printTitle');
-            if (printTitle) printTitle.textContent = `${window.activeParticipant}'s Habit Tracker - ${monthName} ${year}`;
-        }
-
-        function renderParticipantsUI() {
-            const container = document.getElementById('participantButtons');
-            if (!container) return;
-            container.innerHTML = '';
-
-            window.participants.forEach((person) => {
-                const isActive = (person === window.activeParticipant);
-                
-                const btnWrapper = document.createElement('div');
-                btnWrapper.className = "flex items-center gap-1";
-
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.onclick = () => switchParticipant(person);
-                btn.className = `flex-grow text-left px-3 py-2 rounded-xl text-xs font-bold transition flex items-center justify-between cursor-pointer ${
-                    isActive 
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
-                        : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                }`;
-
-                btn.innerHTML = `
-                    <span class="flex items-center gap-2 truncate">
-                        <i class="fa-solid ${isActive ? 'fa-user-check' : 'fa-user'}"></i>
-                        ${person}
-                    </span>
-                    ${isActive ? '<i class="fa-solid fa-chevron-right text-[10px]"></i>' : ''}
-                `;
-
-                btnWrapper.appendChild(btn);
-
-                if (window.participants.length > 1) {
-                    const delBtn = document.createElement('button');
-                    delBtn.type = 'button';
-                    delBtn.onclick = (e) => {
-                        e.stopPropagation();
-                        removeParticipant(person);
-                    };
-                    delBtn.className = "p-2 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-xl transition cursor-pointer text-xs";
-                    delBtn.title = `Remove ${person}`;
-                    delBtn.innerHTML = `<i class="fa-solid fa-xmark"></i>`;
-                    btnWrapper.appendChild(delBtn);
-                }
-
-                container.appendChild(btnWrapper);
-            });
-        }
-
-        window.addParticipant = function(event) {
-            event.preventDefault();
-            const input = document.getElementById('newParticipantName');
-            const value = input.value.trim();
-
-            if (!value) return;
-
-            if (window.participants.some(p => p.toLowerCase() === value.toLowerCase())) {
-                showToast("Participant already exists!", "fa-circle-exclamation");
-                input.value = '';
-                return;
-            }
-
-            window.participants.push(value);
-            window.activeParticipant = value;
-            input.value = '';
-
-            saveStateToCloud();
-            renderAll();
-            showToast(`Added participant: "${value}"`, "fa-user-plus");
-        }
-
-        function removeParticipant(personName) {
-            if (window.participants.length <= 1) {
-                showToast("Must have at least one participant.", "fa-circle-exclamation");
-                return;
-            }
-
-            window.participants = window.participants.filter(p => p !== personName);
-            if (window.completions[personName]) delete window.completions[personName];
-            if (window.bodyMetrics[personName]) delete window.bodyMetrics[personName];
-
-            if (window.activeParticipant === personName) {
-                window.activeParticipant = window.participants[0];
-            }
-
-            saveStateToCloud();
-            renderAll();
-            showToast(`Removed participant: "${personName}"`, "fa-user-minus");
-        }
-
-        window.renderAll = function() {
-            renderHeaderAndControls();
-            renderParticipantsUI();
-            renderCalendarGrid();
-            renderHabitsList();
-            updateStats();
-
-            const pBadge = document.getElementById('activePersonMetricLabel');
-            if (pBadge) pBadge.textContent = window.activeParticipant;
-
-            if (window.activeMainView === 'dashboard') {
-                renderDashboardCharts();
-            }
-        }
-
-        function switchParticipant(personName) {
-            window.activeParticipant = personName;
-            saveStateToCloud();
-            renderAll();
-        }
-
-        window.renderCalendarGrid = function() {
-            const grid = document.getElementById('calendarDaysGrid');
-            grid.innerHTML = '';
-
-            const year = window.currentDate.getFullYear();
-            const month = window.currentDate.getMonth();
-
-            const firstDayIndex = new Date(year, month, 1).getDay();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            const prevTotalDays = new Date(year, month, 0).getDate();
-
-            const today = new Date();
-            const isCurrentMonthAndYear = (today.getFullYear() === year && today.getMonth() === month);
-
-            const userCompletions = window.completions[window.activeParticipant] || {};
-
-            // 1. Prev month trailing days
-            for (let i = firstDayIndex - 1; i >= 0; i--) {
-                const dayNum = prevTotalDays - i;
-                const prevDateObj = new Date(year, month - 1, dayNum);
-                const dayString = formatDateKey(prevDateObj.getFullYear(), prevDateObj.getMonth(), dayNum);
-                grid.appendChild(createDayCellHTML(dayNum, false, false, dayString, {}));
-            }
-
-            // 2. Active month days
-            for (let dayNum = 1; dayNum <= totalDays; dayNum++) {
-                const isToday = (isCurrentMonthAndYear && today.getDate() === dayNum);
-                const dayString = formatDateKey(year, month, dayNum);
-                const dayCompletions = userCompletions[dayString] || {};
-
-                grid.appendChild(createDayCellHTML(dayNum, true, isToday, dayString, dayCompletions));
-            }
-
-            // 3. Next month leading days
-            const totalGridCells = 42;
-            const currentRenderedCells = firstDayIndex + totalDays;
-            const remainingCells = totalGridCells - currentRenderedCells;
-            const nextMonthTarget = (remainingCells > 7) ? (remainingCells - 7) : remainingCells;
-
-            for (let dayNum = 1; dayNum <= nextMonthTarget; dayNum++) {
-                const nextDateObj = new Date(year, month + 1, dayNum);
-                const dayString = formatDateKey(nextDateObj.getFullYear(), nextDateObj.getMonth(), dayNum);
-                grid.appendChild(createDayCellHTML(dayNum, false, false, dayString, {}));
-            }
-        }
-
-        function formatDateKey(year, month, day) {
-            const formattedMonth = String(month + 1).padStart(2, '0');
-            const formattedDay = String(day).padStart(2, '0');
-            return `${year}-${formattedMonth}-${formattedDay}`;
-        }
-
-        function createDayCellHTML(dayNum, isCurrentMonth, isToday, dayString, dayCompletions) {
-            const cell = document.createElement('div');
-            
-            let classes = "day-cell p-1.5 sm:p-2 border flex flex-col justify-between transition-all relative overflow-hidden ";
-            
-            if (isCurrentMonth) {
-                if (isToday) {
-                    classes += "bg-indigo-50/50 border-indigo-400 ring-2 ring-indigo-200/50 print:bg-white print:border-slate-800 print:ring-0";
-                } else {
-                    classes += "bg-white border-slate-100 hover:border-slate-200 print:border-slate-200";
-                }
-            } else {
-                classes += "bg-slate-50/40 border-slate-100/30 text-slate-400 print:bg-white print:border-slate-100/50";
-            }
-
-            cell.className = classes;
-            cell.setAttribute('data-date', dayString);
-
-            const header = document.createElement('div');
-            header.className = "flex justify-between items-center mb-1 print:mb-0.5";
-            
-            const numSpan = document.createElement('span');
-            numSpan.className = `text-[10px] sm:text-xs font-extrabold ${isToday ? 'bg-indigo-600 text-white rounded-full w-5 h-5 flex items-center justify-center font-bold' : 'text-slate-900'}`;
-            numSpan.textContent = dayNum;
-            header.appendChild(numSpan);
-
-            if (isCurrentMonth) {
-                const percentSpan = document.createElement('span');
-                percentSpan.id = `pct-${dayString}`;
-                percentSpan.className = "text-[9px] font-bold text-slate-400 no-print";
-                header.appendChild(percentSpan);
-            }
-
-            cell.appendChild(header);
-
-            const habitWrapper = document.createElement('div');
-            habitWrapper.className = "flex-grow flex flex-col gap-1 sm:gap-1.5 justify-start mt-1 print:mt-0.5";
-
-            if (isCurrentMonth) {
-                window.habits.forEach((habit) => {
-                    const isChecked = !!dayCompletions[habit];
-                    const rowId = `row-${dayString}-${habit.replace(/\s+/g, '-')}`;
-
-                    const label = document.createElement('label');
-                    label.id = rowId;
-                    label.className = "group flex items-center gap-1.5 sm:gap-2 cursor-pointer p-0.5 rounded hover:bg-slate-50 select-none print:hover:bg-transparent print:p-0";
-
-                    const checkContainer = document.createElement('div');
-                    checkContainer.className = "relative flex items-center justify-center";
-
-                    const cb = document.createElement('input');
-                    cb.type = 'checkbox';
-                    cb.checked = isChecked;
-                    cb.className = "habit-checkbox h-3 w-3 sm:h-3.5 sm:w-3.5 rounded border-slate-300 text-indigo-600 focus:ring-indigo-500 transition cursor-pointer print-checked-checkbox";
-                    
-                    cb.onchange = (e) => toggleHabit(dayString, habit, e.target.checked);
-                    
-                    checkContainer.appendChild(cb);
-                    label.appendChild(checkContainer);
-
-                    const textSpan = document.createElement('span');
-                    textSpan.className = `text-[9px] sm:text-[10px] font-semibold leading-tight truncate max-w-[50px] sm:max-w-[75px] ${isChecked ? 'line-through text-slate-400 print-checked-text' : 'text-slate-600 group-hover:text-slate-900'}`;
-                    textSpan.textContent = habit;
-                    textSpan.title = habit;
-                    label.appendChild(textSpan);
-
-                    habitWrapper.appendChild(label);
-                });
-            } else {
-                const infoText = document.createElement('p');
-                infoText.className = "text-[8px] italic text-slate-300 text-center py-2";
-                infoText.textContent = "Out of month";
-                habitWrapper.appendChild(infoText);
-            }
-
-            cell.appendChild(habitWrapper);
-            return cell;
-        }
-
-        window.toggleHabit = function(dayString, habitName, isChecked) {
-            if (!window.completions[window.activeParticipant]) {
-                window.completions[window.activeParticipant] = {};
-            }
-            if (!window.completions[window.activeParticipant][dayString]) {
-                window.completions[window.activeParticipant][dayString] = {};
-            }
-
-            window.completions[window.activeParticipant][dayString][habitName] = isChecked;
-
-            saveStateToCloud();
-            renderCalendarGrid();
-            updateStats();
-
-            if (window.activeMainView === 'dashboard') {
-                renderDashboardCharts();
-            }
-        }
-
-        function renderHabitsList() {
-            const list = document.getElementById('habitsList');
-            const countLabel = document.getElementById('habitsCount');
-            if (!list) return;
-
-            list.innerHTML = '';
-            countLabel.textContent = window.habits.length;
-
-            window.habits.forEach((habit) => {
-                const li = document.createElement('li');
-                li.className = "flex items-center justify-between p-2 rounded-xl bg-slate-50 border border-slate-200 text-xs font-semibold text-slate-700";
-
-                li.innerHTML = `
-                    <span class="truncate flex items-center gap-2">
-                        <i class="fa-solid fa-check text-indigo-500"></i>
-                        ${habit}
-                    </span>
-                    <button type="button" onclick="removeHabit('${habit}')" class="text-slate-400 hover:text-rose-600 transition cursor-pointer p-1" title="Delete habit">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                `;
-                list.appendChild(li);
-            });
-        }
-
-        window.addHabit = function(e) {
-            e.preventDefault();
-            const input = document.getElementById('newHabitName');
-            const value = input.value.trim();
-
-            if (!value) return;
-
-            if (window.habits.some(h => h.toLowerCase() === value.toLowerCase())) {
-                showToast("Habit already exists!", "fa-circle-exclamation");
-                input.value = '';
-                return;
-            }
-
-            window.habits.push(value);
-            input.value = '';
-
-            saveStateToCloud();
-            renderAll();
-            showToast(`Added habit: "${value}"`, "fa-plus");
-        }
-
-        window.removeHabit = function(habitName) {
-            if (window.habits.length <= 1) {
-                showToast("Must keep at least one habit.", "fa-circle-exclamation");
-                return;
-            }
-
-            window.habits = window.habits.filter(h => h !== habitName);
-            saveStateToCloud();
-            renderAll();
-            showToast(`Removed habit: "${habitName}"`, "fa-trash");
-        }
-
-        function updateStats() {
-            const year = window.currentDate.getFullYear();
-            const month = window.currentDate.getMonth();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            const totalPossiblePerPerson = totalDays * window.habits.length;
-
-            // 1. Calculate active participant percentage
-            const personLogs = window.completions[window.activeParticipant] || {};
-            let activeCompletedCount = 0;
-
-            for (let d = 1; d <= totalDays; d++) {
-                const dStr = formatDateKey(year, month, d);
-                const dayData = personLogs[dStr] || {};
-                let dayDone = 0;
-
-                window.habits.forEach(h => {
-                    if (dayData[h] === true) {
-                        activeCompletedCount++;
-                        dayDone++;
-                    }
-                });
-
-                const pctEl = document.getElementById(`pct-${dStr}`);
-                if (pctEl && window.habits.length > 0) {
-                    const dayPct = Math.round((dayDone / window.habits.length) * 100);
-                    pctEl.textContent = dayPct > 0 ? `${dayPct}%` : '';
-                }
-            }
-
-            const activePct = totalPossiblePerPerson > 0 
-                ? Math.round((activeCompletedCount / totalPossiblePerPerson) * 100) 
-                : 0;
-
-            const pctLabel = document.getElementById('completionPercentage');
-            const pBar = document.getElementById('headerProgressBar');
-            const printStats = document.getElementById('printStats');
-
-            if (pctLabel) pctLabel.textContent = `${activePct}%`;
-            if (pBar) pBar.style.width = `${activePct}%`;
-            if (printStats) printStats.textContent = `Completion: ${activePct}%`;
-
-            // 2. Render Leaderboard
-            const lContainer = document.getElementById('leaderboardContainer');
-            if (lContainer) {
-                lContainer.innerHTML = '';
-
-                window.participants.forEach(person => {
-                    const logs = window.completions[person] || {};
-                    let doneCount = 0;
-
-                    for (let d = 1; d <= totalDays; d++) {
-                        const dStr = formatDateKey(year, month, d);
-                        const dayData = logs[dStr] || {};
-                        window.habits.forEach(h => {
-                            if (dayData[h] === true) doneCount++;
-                        });
-                    }
-
-                    const pct = totalPossiblePerPerson > 0 
-                        ? Math.round((doneCount / totalPossiblePerPerson) * 100) 
-                        : 0;
-
-                    const row = document.createElement('div');
-                    row.className = "bg-slate-50 border border-slate-200 rounded-xl p-2.5 flex flex-col gap-1.5";
-
-                    row.innerHTML = `
-                        <div class="flex justify-between items-center text-xs font-bold text-slate-800">
-                            <span>${person}</span>
-                            <span class="text-indigo-600">${pct}%</span>
-                        </div>
-                        <div class="w-full bg-slate-200 h-1.5 rounded-full overflow-hidden">
-                            <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
-                        </div>
-                    `;
-                    lContainer.appendChild(row);
-                });
-            }
-        }
-
-        window.navigateMonth = function(direction) {
-            window.currentDate.setMonth(window.currentDate.getMonth() + direction);
-            syncDateSelectors();
-            renderAll();
-        }
-
-        window.changeDate = function() {
-            const month = parseInt(document.getElementById('monthSelect').value, 10);
-            const year = parseInt(document.getElementById('yearSelect').value, 10);
-            window.currentDate = new Date(year, month, 1);
-            renderAll();
-        }
-
-        window.goToCurrentMonth = function() {
-            window.currentDate = new Date();
-            syncDateSelectors();
-            renderAll();
-        }
-
-        // RESET MODAL HANDLERS
-        window.triggerResetConfirmModal = function() {
-            const overlay = document.getElementById('modalOverlay');
-            const box = document.getElementById('modalBox');
-            overlay.classList.remove('hidden');
-            setTimeout(() => {
-                box.classList.remove('scale-95', 'opacity-0');
-                box.classList.add('scale-100', 'opacity-100');
-            }, 10);
-        }
-
-        window.closeConfirmModal = function() {
-            const overlay = document.getElementById('modalOverlay');
-            const box = document.getElementById('modalBox');
-            box.classList.remove('scale-100', 'opacity-100');
-            box.classList.add('scale-95', 'opacity-0');
-            setTimeout(() => {
-                overlay.classList.add('hidden');
-            }, 200);
-        }
-
-        window.executeReset = function() {
-            window.habits = ['Fat Burn', 'Junk Snack', 'Weight', 'Naked Carb'];
-            window.participants = ['Emily', 'Dad', 'Stephanie'];
-            window.activeParticipant = 'Emily';
-            window.completions = {};
-            window.bodyMetrics = {};
-
-            localStorage.removeItem('family_habits_state_v2');
-            saveStateToCloud();
-            closeConfirmModal();
-            renderAll();
-            showToast("System reset to defaults.", "fa-rotate-right");
-        }
-
-        // TOAST NOTIFICATIONS
-        function showToast(message, iconClass = 'fa-circle-check') {
-            const banner = document.getElementById('notificationBanner');
-            const icon = document.getElementById('notifIcon');
-            const msg = document.getElementById('notifMessage');
-
-            if (!banner) return;
-
-            icon.innerHTML = `<i class="fa-solid ${iconClass}"></i>`;
-            msg.textContent = message;
-
-            banner.classList.remove('translate-y-24', 'opacity-0');
-            banner.classList.add('translate-y-0', 'opacity-100');
-
-            setTimeout(() => {
-                banner.classList.remove('translate-y-0', 'opacity-100');
-                banner.classList.add('translate-y-24', 'opacity-0');
-            }, 3000);
         }
     </script>
 </body>
