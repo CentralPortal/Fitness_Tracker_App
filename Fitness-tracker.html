@@ -810,22 +810,22 @@
             }
         };
 
-        function updateCloudStatusBadge(isOnline) {
+        function updateCloudStatusBadge(isOnline, labelText) {
             const badge = document.getElementById('cloudStatusBadge');
             if (!badge) return;
 
             if (isOnline) {
                 badge.innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
-                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                        Cloud Synced
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full" title="Your data is saved in the cloud and available across launches">
+                        <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                        ${labelText || 'Cloud Synced'}
                     </span>
                 `;
             } else {
                 badge.innerHTML = `
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-slate-100 text-slate-700 border border-slate-300 rounded-full">
-                        <span class="w-1.5 h-1.5 rounded-full bg-slate-500"></span>
-                        Local Safe Mode
+                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-amber-50 text-amber-700 border border-amber-200 rounded-full" title="Cloud currently offline. Storing in local browser memory.">
+                        <span class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                        ${labelText || 'Local Safe Mode'}
                     </span>
                 `;
             }
@@ -834,12 +834,12 @@
         async function saveStateToCloud() {
             saveFallbackLocalState();
 
-            if (!db) return;
+            if (!db || !auth || !auth.currentUser) return;
 
             isSaving = true;
             try {
-                // Use valid 4-segment public collection path so state persists correctly
-                const docRef = doc(db, 'artifacts', appId, 'public', 'trackerState');
+                // Rule 1: STRICT Firestore Path -> /artifacts/{appId}/public/data/{collectionName}/{docId}
+                const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'habitTracker', 'currentState');
                 await setDoc(docRef, {
                     habits: window.habits,
                     participants: window.participants,
@@ -848,8 +848,10 @@
                     bodyMetrics: window.bodyMetrics,
                     updatedAt: new Date().toISOString()
                 }, { merge: true });
+                updateCloudStatusBadge(true, "Cloud Synced");
             } catch (err) {
                 console.warn("Save to Firestore failed, stored locally instead.", err);
+                updateCloudStatusBadge(false, "Local Safe Mode");
             } finally {
                 setTimeout(() => { isSaving = false; }, 500);
             }
@@ -1911,9 +1913,14 @@
                     db = getFirestore(app);
 
                     const connectAuth = async () => {
-                        if (initialAuthToken) {
-                            await signInWithCustomToken(auth, initialAuthToken);
-                        } else {
+                        try {
+                            if (initialAuthToken) {
+                                await signInWithCustomToken(auth, initialAuthToken);
+                            } else {
+                                await signInAnonymously(auth);
+                            }
+                        } catch (tokenErr) {
+                            console.warn("Custom token failed, falling back to anonymous auth:", tokenErr);
                             await signInAnonymously(auth);
                         }
                     };
@@ -1923,42 +1930,49 @@
                             if (user) {
                                 userId = user.uid;
                                 setupRealtimeSync();
+                            } else {
+                                updateCloudStatusBadge(false, "Local Safe Mode");
                             }
                         });
                     }).catch(err => {
                         console.warn("Firebase Auth bypassed, using local safe mode:", err);
-                        updateCloudStatusBadge(false);
+                        updateCloudStatusBadge(false, "Local Safe Mode");
                     });
                 } catch (e) {
                     console.warn("Firebase Config exception, running offline mode:", e);
-                    updateCloudStatusBadge(false);
+                    updateCloudStatusBadge(false, "Local Safe Mode");
                 }
             } else {
-                updateCloudStatusBadge(false);
+                updateCloudStatusBadge(false, "Local Safe Mode");
             }
         };
 
         function setupRealtimeSync() {
-            if (!db) return;
+            if (!db || !auth || !auth.currentUser) return;
 
-            const docRef = doc(db, 'artifacts', appId, 'public', 'trackerState');
+            // Rule 1: Strict path /artifacts/{appId}/public/data/{collectionName}/{documentId}
+            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'habitTracker', 'currentState');
             
             onSnapshot(docRef, (snapshot) => {
                 if (isSaving) return;
                 
                 if (snapshot.exists()) {
                     const data = snapshot.data();
+                    
+                    // Smart merge cloud data with local memory to prevent data loss
                     if (data.habits && Array.isArray(data.habits) && data.habits.length > 0) {
-                        window.habits = data.habits;
+                        const habitsSet = new Set([...window.habits, ...data.habits]);
+                        window.habits = Array.from(habitsSet);
                     }
                     if (data.participants && Array.isArray(data.participants) && data.participants.length > 0) {
-                        window.participants = data.participants;
+                        const participantsSet = new Set([...window.participants, ...data.participants]);
+                        window.participants = Array.from(participantsSet);
                     }
                     if (data.completions) {
-                        window.completions = data.completions;
+                        window.completions = mergeDataObjects(data.completions, window.completions);
                     }
                     if (data.bodyMetrics) {
-                        window.bodyMetrics = data.bodyMetrics;
+                        window.bodyMetrics = mergeDataObjects(data.bodyMetrics, window.bodyMetrics);
                     }
                     if (data.activeParticipant && window.participants.includes(data.activeParticipant)) {
                         window.activeParticipant = data.activeParticipant;
@@ -1967,14 +1981,14 @@
                     migrateHabitNameInCompletions();
                     saveFallbackLocalState();
                     renderAll();
-                    updateCloudStatusBadge(true);
+                    updateCloudStatusBadge(true, "Cloud Synced");
                 } else {
+                    // Initial write if document doesn't exist yet
                     saveStateToCloud();
-                    updateCloudStatusBadge(true);
                 }
             }, (err) => {
                 console.warn("Realtime snapshot listener error, maintaining local state:", err);
-                updateCloudStatusBadge(false);
+                updateCloudStatusBadge(false, "Local Safe Mode");
             });
         }
     </script>
