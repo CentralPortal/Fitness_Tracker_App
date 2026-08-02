@@ -917,6 +917,17 @@
             }
         };
 
+        window.closeBackupModal = function() {
+            const modal = document.getElementById('backupModalOverlay');
+            const box = document.getElementById('backupModalBox');
+            if (box) box.classList.add('scale-95', 'opacity-0');
+            if (modal) {
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                }, 200);
+            }
+        };
+
         window.restoreFromBackupKey = function(key) {
             try {
                 const raw = localStorage.getItem(key);
