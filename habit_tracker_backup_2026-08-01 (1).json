@@ -1,0 +1,32 @@
+{
+  "habits": [
+    "Fat Burn",
+    "Junk Snack",
+    "Weight",
+    "Low Carb Meal"
+  ],
+  "participants": [
+    "Emily",
+    "Dad",
+    "Stephanie"
+  ],
+  "activeParticipant": "Dad",
+  "completions": {
+    "Dad": {
+      "2026-08-01": {
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Low Carb Meal": true
+      }
+    }
+  },
+  "bodyMetrics": {
+    "Dad": {
+      "2026-08-01": {
+        "weight": 164,
+        "tummy": 37
+      }
+    }
+  },
+  "exportedAt": "2026-08-02T01:00:01.507Z"
+}
