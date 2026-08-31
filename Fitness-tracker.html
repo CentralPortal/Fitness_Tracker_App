@@ -96,6 +96,24 @@
             font-weight: 500;
         }
 
+        /* Mobile Responsive Accordion & Calendar Helpers */
+        @media (max-width: 1023px) {
+            .mobile-accordion-content {
+                display: none;
+            }
+            .mobile-accordion-content.open {
+                display: block;
+            }
+        }
+        @media (min-width: 1024px) {
+            .mobile-accordion-content {
+                display: block !important;
+            }
+            .mobile-chevron {
+                display: none !important;
+            }
+        }
+
         @keyframes pop {
             0% { transform: scale(1); }
             50% { transform: scale(1.15); }
@@ -172,208 +190,233 @@
 <body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- TOP NAVIGATION -->
-    <header class="bg-white border-b border-slate-200 py-4 px-6 sticky top-0 z-10 no-print shadow-sm">
-        <div class="max-w-7xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+    <header class="bg-white border-b border-slate-200 py-3 sm:py-4 px-4 sm:px-6 sticky top-0 z-20 no-print shadow-sm">
+        <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
             <!-- App Title -->
             <div class="flex items-center gap-3">
-                <div class="bg-indigo-600 text-white p-2.5 rounded-xl shadow-md shadow-indigo-100 flex items-center justify-center">
-                    <i class="fa-solid fa-calendar-check text-xl"></i>
+                <div class="bg-indigo-600 text-white p-2 sm:p-2.5 rounded-xl shadow-md shadow-indigo-100 flex items-center justify-center shrink-0">
+                    <i class="fa-solid fa-calendar-check text-lg sm:text-xl"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-extrabold text-slate-950 tracking-tight">Family Habit Calendar</h1>
-                    <p class="text-xs text-slate-500 font-medium">Track family goals, log measurements, and print custom monthly routines</p>
+                    <h1 class="text-lg sm:text-xl font-extrabold text-slate-950 tracking-tight leading-tight">Family Habit Calendar</h1>
+                    <p class="text-[11px] sm:text-xs text-slate-500 font-medium hidden sm:block">Track family goals, log measurements, and print custom monthly routines</p>
                 </div>
             </div>
 
-            <!-- Print Actions & Views -->
-            <div class="flex flex-wrap items-center gap-2">
+            <!-- Print Actions & Views - Horizontally Scrollable on Mobile -->
+            <div class="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
                 <!-- Status Badge -->
-                <div id="cloudStatusBadge">
-                    <span class="inline-flex items-center gap-1.5 px-3 py-1.5 text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full">
+                <div id="cloudStatusBadge" class="shrink-0">
+                    <span class="inline-flex items-center gap-1.5 px-2.5 py-1 sm:px-3 sm:py-1.5 text-[11px] sm:text-xs font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200 rounded-full whitespace-nowrap">
                         <span class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
                         Ready (Local)
                     </span>
                 </div>
                 <!-- View Switcher Tabs -->
-                <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
-                    <button id="viewCalBtn" onclick="switchMainView('calendar')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5">
-                        <i class="fa-solid fa-calendar-days"></i> Calendar
+                <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 shrink-0">
+                    <button id="viewCalBtn" onclick="switchMainView('calendar')" class="px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5">
+                        <i class="fa-solid fa-calendar-days"></i> <span class="hidden xs:inline">Calendar</span>
                     </button>
-                    <button id="viewDashBtn" onclick="switchMainView('dashboard')" class="px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5">
-                        <i class="fa-solid fa-chart-line"></i> Dashboard
+                    <button id="viewDashBtn" onclick="switchMainView('dashboard')" class="px-2.5 py-1 sm:px-3 sm:py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5">
+                        <i class="fa-solid fa-chart-line"></i> <span class="hidden xs:inline">Dashboard</span>
                     </button>
                 </div>
                 <!-- Print Trigger Button -->
-                <button onclick="triggerPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-sm py-2 px-4 rounded-xl shadow-lg shadow-indigo-100 transition duration-150 flex items-center gap-2 cursor-pointer">
+                <button onclick="triggerPrint()" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold text-xs sm:text-sm py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl shadow-md shadow-indigo-100 transition duration-150 flex items-center gap-1.5 shrink-0 cursor-pointer">
                     <i class="fa-solid fa-print"></i>
-                    <span>Print Tracker</span>
+                    <span class="hidden sm:inline">Print</span>
                 </button>
-                <button onclick="openBackupModal()" class="bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 font-semibold text-sm py-2 px-4 rounded-xl transition duration-150 flex items-center gap-2 cursor-pointer" title="Backup & Restore Data">
+                <button onclick="openBackupModal()" class="bg-slate-100 hover:bg-indigo-50 hover:text-indigo-600 text-slate-600 font-semibold text-xs sm:text-sm py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl transition duration-150 flex items-center gap-1.5 shrink-0 cursor-pointer" title="Backup & Restore Data">
                     <i class="fa-solid fa-floppy-disk"></i>
-                    <span>Data Backup</span>
+                    <span class="hidden md:inline">Backup</span>
                 </button>
-                <button onclick="triggerResetConfirmModal()" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-semibold text-sm py-2 px-4 rounded-xl transition duration-150 flex items-center gap-2 cursor-pointer">
+                <button onclick="triggerResetConfirmModal()" class="bg-slate-100 hover:bg-rose-50 hover:text-rose-600 text-slate-600 font-semibold text-xs sm:text-sm py-1.5 px-3 sm:py-2 sm:px-4 rounded-xl transition duration-150 flex items-center gap-1.5 shrink-0 cursor-pointer" title="Reset All Data">
                     <i class="fa-solid fa-trash-can"></i>
-                    <span>Reset All</span>
                 </button>
             </div>
         </div>
     </header>
 
     <!-- MAIN BODY -->
-    <main class="flex-grow max-w-7xl w-full mx-auto p-4 md:p-6 flex flex-col lg:flex-row gap-6 print-container">
+    <main class="flex-grow max-w-7xl w-full mx-auto p-3 sm:p-4 md:p-6 flex flex-col lg:flex-row gap-4 sm:gap-6 print-container">
         
         <!-- LEFT SIDE PANEL -->
-        <aside class="w-full lg:w-80 flex flex-col gap-6 no-print shrink-0">
+        <aside class="w-full lg:w-80 flex flex-col gap-3 sm:gap-4 lg:gap-6 no-print shrink-0">
             
             <!-- PARTICIPANT SELECTION SYSTEM -->
-            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
+            <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between cursor-pointer lg:cursor-default" onclick="toggleMobileAccordion('sec-participants')">
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
                         <i class="fa-solid fa-user-group text-indigo-500"></i> Participants
                     </h3>
+                    <i id="chevron-sec-participants" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200 mobile-chevron"></i>
                 </div>
                 
-                <!-- Participant Buttons Selector -->
-                <div id="participantButtons" class="space-y-2 mb-4">
-                    <!-- Populated dynamically via JS -->
-                </div>
-
-                <!-- Add Participant Form -->
-                <form id="addParticipantForm" onsubmit="addParticipant(event)" class="pt-3 border-t border-slate-100">
-                    <label for="newParticipantName" class="block text-xs font-bold uppercase tracking-wider text-slate-400 mb-1.5">Add Participant</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newParticipantName" placeholder="e.g. Mom" max="20" class="flex-grow bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
-                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm cursor-pointer" title="Add Participant">
-                            <i class="fa-solid fa-plus font-bold"></i>
-                        </button>
+                <div id="sec-participants" class="mobile-accordion-content open mt-3">
+                    <!-- Participant Buttons Selector -->
+                    <div id="participantButtons" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-1 gap-2 mb-3">
+                        <!-- Populated dynamically via JS -->
                     </div>
-                </form>
+
+                    <!-- Add Participant Form -->
+                    <form id="addParticipantForm" onsubmit="addParticipant(event)" class="pt-3 border-t border-slate-100">
+                        <label for="newParticipantName" class="block text-[10px] sm:text-xs font-bold uppercase tracking-wider text-slate-400 mb-1">Add Participant</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="newParticipantName" placeholder="e.g. Mom" max="20" class="flex-grow min-w-0 bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
+                            <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2 sm:p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm cursor-pointer shrink-0" title="Add Participant">
+                                <i class="fa-solid fa-plus font-bold"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </section>
 
             <!-- BODY METRICS ENTRY PANEL -->
-            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-2">
-                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-weight-scale text-indigo-500"></i> Log Body Metrics
-                    </h3>
-                    <span id="activePersonMetricLabel" class="text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">Emily</span>
-                </div>
-                <div id="allParticipantMetricsNotice" class="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-100 p-2 rounded-xl mb-3 flex items-center gap-1.5">
-                    <i class="fa-solid fa-database text-indigo-400"></i>
-                    <span id="totalMetricsSummaryText">0 total logs across all participants</span>
+            <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between cursor-pointer lg:cursor-default" onclick="toggleMobileAccordion('sec-metrics')">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-weight-scale text-indigo-500"></i> Log Body Metrics
+                        </h3>
+                        <span id="activePersonMetricLabel" class="text-[10px] sm:text-xs font-bold text-indigo-600 bg-indigo-50 px-2 py-0.5 rounded-lg">Emily</span>
+                    </div>
+                    <i id="chevron-sec-metrics" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200 mobile-chevron"></i>
                 </div>
 
-                <form onsubmit="saveBodyMetrics(event)" class="space-y-3">
-                    <div>
-                        <label for="metricDate" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Log Date</label>
-                        <input type="date" id="metricDate" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
+                <div id="sec-metrics" class="mobile-accordion-content mt-3">
+                    <div id="allParticipantMetricsNotice" class="text-[11px] font-medium text-slate-500 bg-slate-50 border border-slate-100 p-2 rounded-xl mb-3 flex items-center gap-1.5">
+                        <i class="fa-solid fa-database text-indigo-400"></i>
+                        <span id="totalMetricsSummaryText">0 total logs across all participants</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2">
+
+                    <form onsubmit="saveBodyMetrics(event)" class="space-y-3">
                         <div>
-                            <label for="metricWeight" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Weight (lbs)</label>
-                            <input type="number" step="0.1" id="metricWeight" placeholder="e.g. 154.5" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                            <label for="metricDate" class="block text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Log Date</label>
+                            <input type="date" id="metricDate" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none">
                         </div>
-                        <div>
-                            <label for="metricTummy" class="block text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Tummy (in)</label>
-                            <input type="number" step="0.1" id="metricTummy" placeholder="e.g. 32.0" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div>
+                                <label for="metricWeight" class="block text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Weight (lbs)</label>
+                                <input type="number" step="0.1" id="metricWeight" placeholder="e.g. 154.5" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                            </div>
+                            <div>
+                                <label for="metricTummy" class="block text-[10px] sm:text-[11px] font-bold uppercase tracking-wider text-slate-500 mb-1">Tummy (in)</label>
+                                <input type="number" step="0.1" id="metricTummy" placeholder="e.g. 32.0" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs rounded-xl px-3 py-2 focus:ring-2 focus:ring-indigo-500 focus:outline-none" required>
+                            </div>
                         </div>
-                    </div>
-                    <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow transition flex items-center justify-center gap-1.5 cursor-pointer">
-                        <i class="fa-solid fa-floppy-disk"></i> Log Measurements
-                    </button>
-                </form>
+                        <button type="submit" class="w-full bg-slate-900 hover:bg-slate-800 text-white text-xs font-bold py-2.5 px-3 rounded-xl shadow transition flex items-center justify-center gap-1.5 cursor-pointer">
+                            <i class="fa-solid fa-floppy-disk"></i> Log Measurements
+                        </button>
+                    </form>
+                </div>
             </section>
 
             <!-- CALENDAR NAVIGATOR -->
-            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                <h3 class="font-bold text-slate-900 mb-4 flex items-center gap-2">
-                    <i class="fa-solid fa-sliders text-indigo-500"></i> Change Month
-                </h3>
-                
-                <div class="space-y-3">
-                    <div>
-                        <label for="monthSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Month</label>
-                        <select id="monthSelect" onchange="changeDate()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                            <option value="0">January</option>
-                            <option value="1">February</option>
-                            <option value="2">March</option>
-                            <option value="3">April</option>
-                            <option value="4">May</option>
-                            <option value="5">June</option>
-                            <option value="6">July</option>
-                            <option value="7">August</option>
-                            <option value="8">September</option>
-                            <option value="9">October</option>
-                            <option value="10">November</option>
-                            <option value="11">December</option>
-                        </select>
-                    </div>
-
-                    <div>
-                        <label for="yearSelect" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Year</label>
-                        <select id="yearSelect" onchange="changeDate()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-sm font-medium rounded-xl px-3 py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
-                            <!-- Populated in JS -->
-                        </select>
-                    </div>
+            <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between cursor-pointer lg:cursor-default" onclick="toggleMobileAccordion('sec-navigator')">
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-sliders text-indigo-500"></i> Change Month
+                    </h3>
+                    <i id="chevron-sec-navigator" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200 mobile-chevron"></i>
                 </div>
+                
+                <div id="sec-navigator" class="mobile-accordion-content mt-3">
+                    <div class="grid grid-cols-2 gap-2 sm:block sm:space-y-3">
+                        <div>
+                            <label for="monthSelect" class="block text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Month</label>
+                            <select id="monthSelect" onchange="changeDate()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-medium rounded-xl px-2.5 py-2 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                <option value="0">January</option>
+                                <option value="1">February</option>
+                                <option value="2">March</option>
+                                <option value="3">April</option>
+                                <option value="4">May</option>
+                                <option value="5">June</option>
+                                <option value="6">July</option>
+                                <option value="7">August</option>
+                                <option value="8">September</option>
+                                <option value="9">October</option>
+                                <option value="10">November</option>
+                                <option value="11">December</option>
+                            </select>
+                        </div>
 
-                <div class="mt-4 pt-4 border-t border-slate-100 flex items-center justify-between gap-2">
-                    <button onclick="navigateMonth(-1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200 cursor-pointer" title="Previous Month">
-                        <i class="fa-solid fa-chevron-left"></i>
-                    </button>
-                    <button onclick="goToCurrentMonth()" class="px-4 py-2 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200 flex-1 flex justify-center cursor-pointer">
-                        Today
-                    </button>
-                    <button onclick="navigateMonth(1)" class="p-2.5 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200 cursor-pointer" title="Next Month">
-                        <i class="fa-solid fa-chevron-right"></i>
-                    </button>
+                        <div>
+                            <label for="yearSelect" class="block text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Year</label>
+                            <select id="yearSelect" onchange="changeDate()" class="w-full bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm font-medium rounded-xl px-2.5 py-2 sm:py-2.5 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition">
+                                <!-- Populated in JS -->
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="mt-3 sm:mt-4 pt-3 border-t border-slate-100 flex items-center justify-between gap-2">
+                        <button onclick="navigateMonth(-1)" class="p-2 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200 cursor-pointer" title="Previous Month">
+                            <i class="fa-solid fa-chevron-left text-xs"></i>
+                        </button>
+                        <button onclick="goToCurrentMonth()" class="px-3 py-1.5 hover:bg-slate-100 text-slate-700 text-xs font-bold rounded-xl transition border border-slate-200 flex-1 flex justify-center cursor-pointer">
+                            Today
+                        </button>
+                        <button onclick="navigateMonth(1)" class="p-2 hover:bg-slate-100 text-slate-600 rounded-xl transition flex-1 flex justify-center border border-slate-200 cursor-pointer" title="Next Month">
+                            <i class="fa-solid fa-chevron-right text-xs"></i>
+                        </button>
+                    </div>
                 </div>
             </section>
 
             <!-- HABIT TRACKER / MANAGER -->
-            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                <div class="flex items-center justify-between mb-3">
-                    <h3 class="font-bold text-slate-900 flex items-center gap-2">
-                        <i class="fa-solid fa-list-check text-indigo-500"></i> Habits List
-                    </h3>
-                    <span id="habitsCount" class="bg-indigo-50 text-indigo-600 text-xs px-2.5 py-0.5 rounded-full font-bold">4</span>
-                </div>
-                <p class="text-xs text-slate-400 mb-4 leading-relaxed">Changes to habits will update the dynamic layout for all participants.</p>
-
-                <!-- List of current active habits -->
-                <ul id="habitsList" class="space-y-2.5 max-h-56 overflow-y-auto mb-4 pr-1">
-                    <!-- Loaded dynamically via JS -->
-                </ul>
-
-                <!-- Add a custom habit form -->
-                <form id="addHabitForm" onsubmit="addHabit(event)" class="pt-3 border-t border-slate-100">
-                    <label for="newHabitName" class="block text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">Add Custom Habit</label>
-                    <div class="flex gap-2">
-                        <input type="text" id="newHabitName" placeholder="e.g. Read 15 mins" max="30" class="flex-grow bg-slate-50 border border-slate-200 text-slate-800 text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
-                        <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm cursor-pointer" title="Add Habit">
-                            <i class="fa-solid fa-plus font-bold"></i>
-                        </button>
+            <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between cursor-pointer lg:cursor-default" onclick="toggleMobileAccordion('sec-habits')">
+                    <div class="flex items-center gap-2">
+                        <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                            <i class="fa-solid fa-list-check text-indigo-500"></i> Habits List
+                        </h3>
+                        <span id="habitsCount" class="bg-indigo-50 text-indigo-600 text-xs px-2 py-0.5 rounded-full font-bold">4</span>
                     </div>
-                </form>
+                    <i id="chevron-sec-habits" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200 mobile-chevron"></i>
+                </div>
+
+                <div id="sec-habits" class="mobile-accordion-content mt-3">
+                    <p class="text-[11px] sm:text-xs text-slate-400 mb-3 leading-relaxed">Changes to habits will update the dynamic layout for all participants.</p>
+
+                    <!-- List of current active habits -->
+                    <ul id="habitsList" class="space-y-2 max-h-48 overflow-y-auto mb-3 pr-1">
+                        <!-- Loaded dynamically via JS -->
+                    </ul>
+
+                    <!-- Add a custom habit form -->
+                    <form id="addHabitForm" onsubmit="addHabit(event)" class="pt-3 border-t border-slate-100">
+                        <label for="newHabitName" class="block text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1">Add Custom Habit</label>
+                        <div class="flex gap-2">
+                            <input type="text" id="newHabitName" placeholder="e.g. Read 15 mins" max="30" class="flex-grow min-w-0 bg-slate-50 border border-slate-200 text-slate-800 text-xs sm:text-sm rounded-xl px-3 py-2 focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition" required>
+                            <button type="submit" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-600 p-2 sm:p-2.5 rounded-xl transition flex items-center justify-center border border-indigo-100 shadow-sm cursor-pointer shrink-0" title="Add Habit">
+                                <i class="fa-solid fa-plus font-bold"></i>
+                            </button>
+                        </div>
+                    </form>
+                </div>
             </section>
 
             <!-- COMPARATIVE SCOREBOARD -->
-            <section class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
-                <h3 class="font-bold text-slate-900 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-chart-simple text-indigo-500"></i> Family Leaderboard
-                </h3>
-                <p class="text-xs text-slate-400 mb-4 leading-relaxed">Monthly track records compared side-by-side.</p>
-                
-                <div id="leaderboardContainer" class="space-y-3">
-                    <!-- Populated dynamically via JS -->
+            <section class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
+                <div class="flex items-center justify-between cursor-pointer lg:cursor-default" onclick="toggleMobileAccordion('sec-leaderboard')">
+                    <h3 class="font-bold text-slate-900 text-sm sm:text-base flex items-center gap-2">
+                        <i class="fa-solid fa-chart-simple text-indigo-500"></i> Family Leaderboard
+                    </h3>
+                    <i id="chevron-sec-leaderboard" class="fa-solid fa-chevron-down text-slate-400 text-xs transition-transform duration-200 mobile-chevron"></i>
+                </div>
+
+                <div id="sec-leaderboard" class="mobile-accordion-content mt-3">
+                    <p class="text-[11px] sm:text-xs text-slate-400 mb-3 leading-relaxed">Monthly track records compared side-by-side.</p>
+                    
+                    <div id="leaderboardContainer" class="space-y-2">
+                        <!-- Populated dynamically via JS -->
+                    </div>
                 </div>
             </section>
 
         </aside>
 
         <!-- CALENDAR WORKSPACE (PRINTABLE & DYNAMIC) -->
-        <div class="flex-grow flex flex-col gap-4">
+        <div class="flex-grow flex flex-col gap-3 sm:gap-4 min-w-0">
             <!-- Custom Banner shown only in Printout -->
             <div class="hidden print-header flex justify-between items-center border-b-2 border-slate-900 pb-3">
                 <div>
@@ -387,23 +430,23 @@
             </div>
 
             <!-- TAB 1: CALENDAR VIEW SECTION -->
-            <div id="calendarViewSection" class="flex flex-col gap-4">
+            <div id="calendarViewSection" class="flex flex-col gap-3 sm:gap-4">
                 <!-- Calendar Dynamic Header -->
-                <div class="no-print flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+                <div class="no-print flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4 bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm">
                     <div>
-                        <div class="flex items-center gap-2.5">
-                            <span id="headerParticipantBadge" class="px-2.5 py-0.5 text-xs font-bold bg-indigo-100 text-indigo-700 rounded-lg">EMILY</span>
-                            <h2 id="calendarHeaderTitle" class="text-2xl font-black text-slate-900 tracking-tight">July 2026</h2>
+                        <div class="flex items-center gap-2">
+                            <span id="headerParticipantBadge" class="px-2 py-0.5 text-[10px] sm:text-xs font-bold bg-indigo-100 text-indigo-700 rounded-lg">EMILY</span>
+                            <h2 id="calendarHeaderTitle" class="text-xl sm:text-2xl font-black text-slate-900 tracking-tight">July 2026</h2>
                         </div>
-                        <p class="text-xs font-semibold text-slate-500 mt-1.5">Click checkboxes below to mark daily items for the active person.</p>
+                        <p class="text-[11px] sm:text-xs font-semibold text-slate-500 mt-1">Tap checkboxes below to mark daily items for active person.</p>
                     </div>
-                    <div class="flex items-center gap-4">
-                        <div class="text-right flex flex-col items-end">
+                    <div class="flex items-center gap-4 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-100">
+                        <div class="text-left sm:text-right flex flex-col items-start sm:items-end w-full sm:w-auto">
                             <div class="flex items-center gap-1.5 text-xs font-bold text-slate-500">
-                                <span>Month Completion:</span>
+                                <span>Completion:</span>
                                 <span id="completionPercentage" class="text-sm font-extrabold text-indigo-600">0%</span>
                             </div>
-                            <div class="w-24 bg-slate-100 h-1.5 rounded-full mt-1 overflow-hidden">
+                            <div class="w-full sm:w-28 bg-slate-100 h-2 rounded-full mt-1 overflow-hidden">
                                 <div id="headerProgressBar" class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: 0%"></div>
                             </div>
                         </div>
@@ -411,125 +454,127 @@
                 </div>
 
                 <!-- THE CALENDAR WRAPPER -->
-                <div class="bg-white border border-slate-200 rounded-2xl p-3 sm:p-5 shadow-sm flex-grow flex flex-col justify-between print:border-none print:p-0 print:shadow-none">
-                    <!-- Days of Week Header -->
-                    <div class="grid grid-cols-7 text-center gap-1 sm:gap-2 mb-2 font-bold text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-3 calendar-grid-header print:pb-1 print:border-slate-800">
-                        <div class="py-1 text-rose-500">Sun</div>
-                        <div class="py-1">Mon</div>
-                        <div class="py-1">Tue</div>
-                        <div class="py-1">Wed</div>
-                        <div class="py-1">Thu</div>
-                        <div class="py-1">Fri</div>
-                        <div class="py-1">Sat</div>
-                    </div>
+                <div class="bg-white border border-slate-200 rounded-2xl p-2.5 sm:p-4 lg:p-5 shadow-sm flex-grow flex flex-col justify-between print:border-none print:p-0 print:shadow-none overflow-x-auto">
+                    <div class="min-w-[500px] sm:min-w-0">
+                        <!-- Days of Week Header -->
+                        <div class="grid grid-cols-7 text-center gap-1 sm:gap-2 mb-2 font-bold text-[10px] sm:text-xs text-slate-400 uppercase tracking-wider border-b border-slate-100 pb-2 calendar-grid-header print:pb-1 print:border-slate-800">
+                            <div class="py-1 text-rose-500">Sun</div>
+                            <div class="py-1">Mon</div>
+                            <div class="py-1">Tue</div>
+                            <div class="py-1">Wed</div>
+                            <div class="py-1">Thu</div>
+                            <div class="py-1">Fri</div>
+                            <div class="py-1">Sat</div>
+                        </div>
 
-                    <!-- Days Grid -->
-                    <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1.5 sm:gap-3 flex-grow calendar-grid print:gap-0">
-                        <!-- Populated dynamically via JS -->
+                        <!-- Days Grid -->
+                        <div id="calendarDaysGrid" class="grid grid-cols-7 gap-1 sm:gap-2.5 flex-grow calendar-grid print:gap-0">
+                            <!-- Populated dynamically via JS -->
+                        </div>
                     </div>
                 </div>
 
                 <!-- Helpful tips section below the calendar -->
-                <div class="no-print bg-slate-100/60 border border-slate-200 rounded-2xl p-4 flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div class="no-print bg-slate-100/60 border border-slate-200 rounded-2xl p-3 sm:p-4 flex items-start sm:items-center gap-3">
                     <div class="bg-white p-2 border border-slate-200 rounded-xl flex items-center justify-center shrink-0">
-                        <i class="fa-solid fa-circle-info text-indigo-500 text-lg"></i>
+                        <i class="fa-solid fa-circle-info text-indigo-500 text-base sm:text-lg"></i>
                     </div>
-                    <div class="text-xs text-slate-600 leading-relaxed">
-                        <strong>Tip:</strong> Select a participant in the sidebar to log items for them. Click "Print Tracker" above to print a formatted page. Unchecked habits show a red ✕ box; checked habits show a green ✓ box with emerald green text (no strikethrough).
+                    <div class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
+                        <strong>Tip:</strong> Select participants in the sidebar to log tasks. Tap "Print" to print a custom page. Unchecked habits show a red ✕ box; checked habits show a green ✓ box with green text.
                     </div>
                 </div>
             </div>
 
             <!-- TAB 2: VISUALIZATION DASHBOARD VIEW SECTION -->
-            <div id="dashboardViewSection" class="hidden flex flex-col gap-6 no-print">
-                <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div id="dashboardViewSection" class="hidden flex flex-col gap-4 sm:gap-6 no-print">
+                <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col sm:flex-row justify-between items-start sm:items-center gap-3 sm:gap-4">
                     <div>
                         <div class="flex items-center gap-2">
-                            <span class="bg-indigo-50 text-indigo-600 text-xs font-extrabold px-2.5 py-1 rounded-lg uppercase tracking-wide">
+                            <span class="bg-indigo-50 text-indigo-600 text-[10px] sm:text-xs font-extrabold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg uppercase tracking-wide">
                                 Progress Analytics
                             </span>
-                            <h2 id="dashParticipantTitle" class="text-2xl font-black text-slate-900 tracking-tight">Emily's Fitness & Task Dashboard</h2>
+                            <h2 id="dashParticipantTitle" class="text-lg sm:text-2xl font-black text-slate-900 tracking-tight">Emily's Dashboard</h2>
                         </div>
-                        <p class="text-xs text-slate-500 font-medium mt-1">Real-time visualization charts comparing weight, tummy size, and habit execution consistency.</p>
+                        <p class="text-[11px] sm:text-xs text-slate-500 font-medium mt-1">Real-time charts comparing weight, tummy size, and habit execution consistency.</p>
                     </div>
                     <div class="flex items-center gap-3">
-                        <div class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-2 text-center">
-                            <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Active Person Logs</span>
-                            <span id="dashMetricCount" class="text-sm font-black text-indigo-600">0 logs</span>
+                        <div class="bg-slate-50 border border-slate-200 rounded-xl px-3 py-1.5 text-center">
+                            <span class="text-[9px] sm:text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Active Person Logs</span>
+                            <span id="dashMetricCount" class="text-xs sm:text-sm font-black text-indigo-600">0 logs</span>
                         </div>
                     </div>
                 </div>
 
                 <!-- DASHBOARD CHARTS GRID -->
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
                     
                     <!-- CHART 1: WEIGHT TREND -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-weight-scale text-indigo-500"></i>
-                                <h3 class="font-bold text-slate-900 text-sm">Weight Progression</h3>
+                                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Weight Progression</h3>
                             </div>
-                            <span class="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded-full">Weight Log</span>
+                            <span class="text-[9px] sm:text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded-full">Weight Log</span>
                         </div>
-                        <div class="relative w-full min-h-[260px] flex items-center justify-center">
+                        <div class="relative w-full h-52 sm:h-64 flex items-center justify-center">
                             <canvas id="weightMetricsChart"></canvas>
                         </div>
                     </div>
 
                     <!-- CHART 2: TUMMY SIZE TREND -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-tape text-rose-500"></i>
-                                <h3 class="font-bold text-slate-900 text-sm">Tummy Size Progression</h3>
+                                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Tummy Size Progression</h3>
                             </div>
-                            <span class="text-[10px] bg-rose-50 text-rose-600 font-bold px-2 py-0.5 rounded-full">Tummy Log</span>
+                            <span class="text-[9px] sm:text-[10px] bg-rose-50 text-rose-600 font-bold px-2 py-0.5 rounded-full">Tummy Log</span>
                         </div>
-                        <div class="relative w-full min-h-[260px] flex items-center justify-center">
+                        <div class="relative w-full h-52 sm:h-64 flex items-center justify-center">
                             <canvas id="tummyMetricsChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- CHART 3: DAILY HABIT CONSISTENCY -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <!-- CHART 3: DUAL BODY METRICS -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-tape text-indigo-500"></i>
-                                <h3 class="font-bold text-slate-900 text-sm">Body Metrics Progression</h3>
+                                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Body Metrics Progression</h3>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">Dual Metric Trend</span>
+                            <span class="text-[9px] sm:text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">Dual Metric Trend</span>
                         </div>
-                        <div class="relative w-full min-h-[260px] flex items-center justify-center">
+                        <div class="relative w-full h-52 sm:h-64 flex items-center justify-center">
                             <canvas id="bodyMetricsChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- CHART 2: DAILY HABIT CONSISTENCY -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <!-- CHART 4: DAILY HABIT CONSISTENCY -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-3">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-chart-column text-indigo-500"></i>
-                                <h3 class="font-bold text-slate-900 text-sm">Daily Habit Execution Trend</h3>
+                                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Daily Habit Execution Trend</h3>
                             </div>
-                            <span id="dashChartMonthLabel" class="text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded-full">July 2026</span>
+                            <span id="dashChartMonthLabel" class="text-[9px] sm:text-[10px] bg-indigo-50 text-indigo-600 font-bold px-2 py-0.5 rounded-full">July 2026</span>
                         </div>
-                        <div class="relative w-full min-h-[260px] flex items-center justify-center">
+                        <div class="relative w-full h-52 sm:h-64 flex items-center justify-center">
                             <canvas id="habitConsistencyChart"></canvas>
                         </div>
                     </div>
 
-                    <!-- CHART 3: HABIT BREAKDOWN (DOUGHNUT) -->
-                    <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm flex flex-col gap-3 lg:col-span-2">
-                        <div class="flex items-center justify-between border-b border-slate-100 pb-3">
+                    <!-- CHART 5: HABIT BREAKDOWN (DOUGHNUT) -->
+                    <div class="bg-white border border-slate-200 rounded-2xl p-4 sm:p-5 shadow-sm flex flex-col gap-3 lg:col-span-2">
+                        <div class="flex items-center justify-between border-b border-slate-100 pb-2.5">
                             <div class="flex items-center gap-2">
                                 <i class="fa-solid fa-pie-chart text-indigo-500"></i>
-                                <h3 class="font-bold text-slate-900 text-sm">Habit Completion Comparison Breakdown</h3>
+                                <h3 class="font-bold text-slate-900 text-xs sm:text-sm">Habit Completion Comparison Breakdown</h3>
                             </div>
-                            <span class="text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">Monthly Breakdown</span>
+                            <span class="text-[9px] sm:text-[10px] bg-slate-100 text-slate-600 font-bold px-2 py-0.5 rounded-full">Monthly Breakdown</span>
                         </div>
-                        <div class="relative w-full max-h-[280px] flex justify-center items-center py-2">
-                            <canvas id="habitBreakdownChart" class="max-w-md max-h-[260px]"></canvas>
+                        <div class="relative w-full h-56 sm:h-64 flex justify-center items-center py-2">
+                            <canvas id="habitBreakdownChart" class="max-w-md max-h-[240px]"></canvas>
                         </div>
                     </div>
 
@@ -639,6 +684,23 @@
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
 
+        /* Mobile Accordion Helper */
+        window.toggleMobileAccordion = function(id) {
+            if (window.innerWidth >= 1024) return; // Only toggle on mobile/tablet
+            const content = document.getElementById(id);
+            const chevron = document.getElementById(`chevron-${id}`);
+            if (content) {
+                const isOpen = content.classList.contains('open');
+                if (isOpen) {
+                    content.classList.remove('open');
+                    if (chevron) chevron.style.transform = 'rotate(0deg)';
+                } else {
+                    content.classList.add('open');
+                    if (chevron) chevron.style.transform = 'rotate(180deg)';
+                }
+            }
+        };
+
         const PRIMARY_STORAGE_KEY = 'family_habit_tracker_state';
         const BACKUP_STORAGE_KEYS = [
             'family_habit_tracker_state',
@@ -656,6 +718,7 @@
 
         let weightChartInstance = null;
         let tummyChartInstance = null;
+        let bodyMetricsChartInstance = null;
         let consistencyChartInstance = null;
         let breakdownChartInstance = null;
 
@@ -1055,806 +1118,273 @@
                 let gridCellsHtml = '';
                 
                 for (let i = 0; i < firstDayIndex; i++) {
-                    gridCellsHtml += `<div class="cell empty"></div>`;
+                    gridCellsHtml += `<div class="bg-slate-50 border border-slate-200 p-2 min-h-[90px]"></div>`;
                 }
 
                 for (let d = 1; d <= totalDays; d++) {
                     const dStr = formatDateKey(year, month, d);
-                    const dayLogs = userCompletions[dStr] || {};
+                    const dayData = userCompletions[dStr] || {};
                     
                     let habitsHtml = '';
                     window.habits.forEach(h => {
-                        const checked = !!dayLogs[h];
+                        const isDone = !!dayData[h];
+                        const checkChar = isDone ? '✓' : '✕';
+                        const checkBg = isDone ? '#10b981' : '#ef4444';
+                        const checkBorder = isDone ? '#059669' : '#dc2626';
+                        const textCol = isDone ? '#059669' : '#334155';
+                        const fontW = isDone ? 'bold' : 'normal';
+
                         habitsHtml += `
-                            <div class="habit-item ${checked ? 'checked' : ''}">
-                                <span class="box ${checked ? 'box-checked' : 'box-unchecked'}">${checked ? '✓' : '✕'}</span>
-                                <span class="habit-name">${h}</span>
+                            <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 3px;">
+                                <div style="width: 14px; height: 14px; border-radius: 3px; background-color: ${checkBg}; border: 1px solid ${checkBorder}; display: flex; align-items: center; justify-content: center; color: white; font-size: 9px; font-weight: 900; flex-shrink: 0;">${checkChar}</div>
+                                <span style="font-size: 10px; color: ${textCol}; font-weight: ${fontW}; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${h}</span>
                             </div>
                         `;
                     });
 
                     gridCellsHtml += `
-                        <div class="cell">
-                            <div class="day-num">${d}</div>
-                            <div class="habits-container">${habitsHtml}</div>
+                        <div style="border: 1px solid #cbd5e1; background: #ffffff; padding: 6px; min-height: 95px; box-sizing: border-box;">
+                            <div style="font-weight: 800; font-size: 12px; color: #1e293b; margin-bottom: 4px; border-bottom: 1px solid #f1f5f9; padding-bottom: 2px;">${d}</div>
+                            ${habitsHtml}
                         </div>
                     `;
                 }
 
-                const printHtml = `
-            <!DOCTYPE html>
-            <html>
-            <head>
-                <title>${activePerson}'s Habit Tracker - ${monthName} ${year}</title>
-                <style>
-                    @page { size: landscape; margin: 10mm; }
-                    body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 15px; color: #0f172a; background: #fff; }
-                    
-                    .no-print-bar { background: #e0e7ff; color: #3730a3; padding: 10px 16px; border-radius: 8px; margin-bottom: 15px; display: flex; justify-content: space-between; align-items: center; font-size: 13px; font-weight: 600; }
-                    .print-btn { background: #4f46e5; color: white; border: none; padding: 8px 18px; border-radius: 6px; font-weight: 700; cursor: pointer; font-size: 13px; }
-                    .print-btn:hover { background: #4338ca; }
-
-                    .header { display: flex; justify-content: space-between; align-items: flex-end; border-bottom: 2px solid #0f172a; padding-bottom: 8px; margin-bottom: 12px; }
-                    .header h1 { margin: 0; font-size: 20px; font-weight: 800; text-transform: uppercase; letter-spacing: -0.02em; }
-                    .header p { margin: 2px 0 0 0; font-size: 11px; color: #64748b; }
-                    .stats { text-align: right; font-size: 13px; font-weight: 700; color: #4f46e5; }
-
-                    .grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 700; font-size: 11px; text-transform: uppercase; background: #f1f5f9; border: 1px solid #cbd5e1; padding: 6px 0; }
-                    .grid { display: grid; grid-template-columns: repeat(7, 1fr); border-left: 1px solid #cbd5e1; border-top: 1px solid #cbd5e1; }
-                    .cell { border-right: 1px solid #cbd5e1; border-bottom: 1px solid #cbd5e1; min-height: 95px; padding: 5px; box-sizing: border-box; background: #fff; }
-                    .cell.empty { background: #f8fafc; }
-                    .day-num { font-weight: 800; font-size: 11px; margin-bottom: 4px; color: #0f172a; }
-
-                    .habits-container { display: flex; flex-direction: column; gap: 3px; }
-                    .habit-item { display: flex; align-items: center; gap: 5px; font-size: 9px; font-weight: 500; color: #334155; }
-                    .habit-item.checked .habit-name { text-decoration: none; color: #059669; font-weight: 700; }
-                    
-                    .box { display: inline-flex; align-items: center; justify-content: center; width: 12px; height: 12px; color: #fff; font-size: 8px; font-weight: bold; border-radius: 2px; line-height: 1; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
-                    .box-unchecked { background: #ef4444; border: 1px solid #dc2626; }
-                    .box-checked { background: #10b981; border: 1px solid #059669; }
-
-                    @media print { 
-                        .no-print-bar { display: none !important; }
-                        body { padding: 0; }
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="no-print-bar">
-                    <span>Print Preview: Click "Print Now" or press <code>Ctrl + P</code> / <code>Cmd + P</code> to print/save as PDF.</span>
-                    <button class="print-btn" onclick="window.print()">Print Now</button>
-                </div>
-                <div class="header">
-                    <div>
-                        <h1>${activePerson}'s Habit Tracker - ${monthName} ${year}</h1>
-                        <p>Monthly Performance Grid & Daily Consistency Log</p>
-                    </div>
-                    <div class="stats">
-                        <div>Completion Rate: ${pct}%</div>
-                    </div>
-                </div>
-                <div class="grid-header">
-                    <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
-                </div>
-                <div class="grid">
-                    ${gridCellsHtml}
-                </div>
-                <script>
-                    window.onload = function() {
-                        setTimeout(function() {
-                            try { window.print(); } catch(e){}
-                        }, 250);
-                    };
-                <\/script>
-            </body>
-            </html>
-            `;
-
                 const printWin = window.open('', '_blank');
-                if (printWin) {
-                    printWin.document.open();
-                    printWin.document.write(printHtml);
-                    printWin.document.close();
-                } else {
-                    window.print();
+                if (!printWin) {
+                    showToast("Pop-up blocked. Allow pop-ups to open print tab.", "fa-circle-exclamation");
+                    return;
                 }
-            } catch (e) {
-                console.error("Failed opening print window:", e);
-                window.print();
+
+                printWin.document.write(`
+                    <!DOCTYPE html>
+                    <html>
+                    <head>
+                        <title>${activePerson} - ${monthName} ${year} Habit Tracker</title>
+                        <style>
+                            body { font-family: 'Inter', system-ui, sans-serif; margin: 0; padding: 15px; color: #0f172a; }
+                            .header { display: flex; justify-content: space-between; align-items: center; border-bottom: 2px solid #0f172a; padding-bottom: 10px; margin-bottom: 15px; }
+                            .header h1 { margin: 0; font-size: 22px; font-weight: 900; text-transform: uppercase; letter-spacing: -0.5px; }
+                            .header p { margin: 3px 0 0 0; font-size: 11px; color: #64748b; }
+                            .stats { text-align: right; font-weight: 800; font-size: 14px; color: #4338ca; }
+                            .grid-header { display: grid; grid-template-columns: repeat(7, 1fr); text-align: center; font-weight: 800; font-size: 11px; text-transform: uppercase; border-top: 2px solid #000; border-bottom: 2px solid #000; background: #f8fafc; padding: 6px 0; margin-bottom: 4px; }
+                            .grid { display: grid; grid-template-columns: repeat(7, 1fr); gap: 0; }
+                            @page { size: landscape; margin: 0.3in; }
+                        </style>
+                    </head>
+                    <body>
+                        <div class="header">
+                            <div>
+                                <h1>${activePerson}'s Habit Tracker</h1>
+                                <p>${monthName} ${year} Monthly Performance Log</p>
+                            </div>
+                            <div class="stats">
+                                Month Completion: ${pct}%
+                            </div>
+                        </div>
+                        <div class="grid-header">
+                            <div style="color: #e11d48;">Sun</div>
+                            <div>Mon</div>
+                            <div>Tue</div>
+                            <div>Wed</div>
+                            <div>Thu</div>
+                            <div>Fri</div>
+                            <div>Sat</div>
+                        </div>
+                        <div class="grid">
+                            ${gridCellsHtml}
+                        </div>
+                        <script>
+                            window.onload = function() {
+                                window.print();
+                            };
+                        <\/script>
+                    </body>
+                    </html>
+                `);
+                printWin.document.close();
+            } catch (err) {
+                console.error("Failed to generate printable tab:", err);
             }
         };
 
-        /* View Switcher */
+        /* Navigation & View Switching */
         window.switchMainView = function(viewName) {
             window.activeMainView = viewName;
-            const calSec = document.getElementById('calendarViewSection');
-            const dashSec = document.getElementById('dashboardViewSection');
+            const calSection = document.getElementById('calendarViewSection');
+            const dashSection = document.getElementById('dashboardViewSection');
             const calBtn = document.getElementById('viewCalBtn');
             const dashBtn = document.getElementById('viewDashBtn');
 
             if (viewName === 'calendar') {
-                calSec.classList.remove('hidden');
-                dashSec.classList.add('hidden');
-                calBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5";
-                dashBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5";
+                calSection.classList.remove('hidden');
+                dashSection.classList.add('hidden');
+                calBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5';
+                dashBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5';
             } else {
-                calSec.classList.add('hidden');
-                dashSec.classList.remove('hidden');
-                dashBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5";
-                calBtn.className = "px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5";
-                renderDashboardCharts();
+                calSection.classList.add('hidden');
+                dashSection.classList.remove('hidden');
+                dashBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg transition bg-white text-indigo-600 shadow-sm cursor-pointer flex items-center gap-1.5';
+                calBtn.className = 'px-3 py-1.5 text-xs font-bold rounded-lg transition text-slate-600 hover:text-slate-900 cursor-pointer flex items-center gap-1.5';
+                renderDashboard();
             }
         };
 
-        /* Participant Selection & Management */
-        window.selectParticipant = function(name) {
-            window.activeParticipant = name;
+        window.selectParticipant = function(pName) {
+            window.activeParticipant = pName;
+            saveStateToCloud();
             renderAll();
-            showToast(`Switched view to ${name}`, "fa-user");
+            showToast(`Switched active profile to ${pName}`, "fa-user-check");
         };
 
-        window.addParticipant = function(e) {
-            e.preventDefault();
+        window.addParticipant = function(event) {
+            event.preventDefault();
             const input = document.getElementById('newParticipantName');
-            const name = input.value.trim();
-            if (!name) return;
+            const val = input.value.trim();
+            if (!val) return;
 
-            if (window.participants.includes(name)) {
-                showToast(`${name} already exists!`, "fa-triangle-exclamation");
+            if (window.participants.some(p => p.toLowerCase() === val.toLowerCase())) {
+                showToast("Participant already exists!", "fa-circle-exclamation");
                 return;
             }
 
-            window.participants.push(name);
-            window.activeParticipant = name;
+            window.participants.push(val);
+            window.activeParticipant = val;
             input.value = '';
             saveStateToCloud();
             renderAll();
-            showToast(`Added ${name} to participants!`, "fa-user-plus");
+            showToast(`Added ${val} to family group!`, "fa-user-plus");
         };
 
-        /* Habits List Management */
-        window.addHabit = function(e) {
-            e.preventDefault();
+        window.addHabit = function(event) {
+            event.preventDefault();
             const input = document.getElementById('newHabitName');
-            const habit = input.value.trim();
-            if (!habit) return;
+            const val = input.value.trim();
+            if (!val) return;
 
-            if (window.habits.includes(habit)) {
-                showToast(`${habit} already in habits list!`, "fa-triangle-exclamation");
+            if (window.habits.some(h => h.toLowerCase() === val.toLowerCase())) {
+                showToast("Habit already exists!", "fa-circle-exclamation");
                 return;
             }
 
-            window.habits.push(habit);
+            window.habits.push(val);
             input.value = '';
             saveStateToCloud();
             renderAll();
-            showToast(`Added habit: ${habit}`, "fa-plus");
+            showToast(`Added new habit: "${val}"`, "fa-plus-circle");
         };
 
-        window.removeHabit = function(habitName) {
-            window.habits = window.habits.filter(h => h !== habitName);
+        window.deleteHabit = function(hName) {
+            if (window.habits.length <= 1) {
+                showToast("Keep at least one habit in tracker!", "fa-circle-exclamation");
+                return;
+            }
+            window.habits = window.habits.filter(h => h !== hName);
             saveStateToCloud();
             renderAll();
-            showToast(`Removed habit: ${habitName}`, "fa-trash");
+            showToast(`Removed habit "${hName}"`, "fa-trash-can");
         };
 
-        /* Calendar Date Control */
-        function populateYearSelect() {
-            const yearSelect = document.getElementById('yearSelect');
-            if (!yearSelect) return;
-            yearSelect.innerHTML = '';
-            const currentYear = new Date().getFullYear();
-            for (let y = currentYear - 2; y <= currentYear + 5; y++) {
-                const opt = document.createElement('option');
-                opt.value = y;
-                opt.textContent = y;
-                yearSelect.appendChild(opt);
-            }
-        }
-
-        function syncDateSelectors() {
-            const mSel = document.getElementById('monthSelect');
-            const ySel = document.getElementById('yearSelect');
-            if (mSel) mSel.value = window.currentDate.getMonth();
-            if (ySel) ySel.value = window.currentDate.getFullYear();
-        }
-
-        window.changeDate = function() {
-            const mSel = document.getElementById('monthSelect');
-            const ySel = document.getElementById('yearSelect');
-            if (mSel && ySel) {
-                window.currentDate.setMonth(parseInt(mSel.value));
-                window.currentDate.setFullYear(parseInt(ySel.value));
-                renderAll();
-            }
-        };
-
-        window.navigateMonth = function(delta) {
-            window.currentDate.setMonth(window.currentDate.getMonth() + delta);
-            syncDateSelectors();
-            renderAll();
-        };
-
-        window.goToCurrentMonth = function() {
-            window.currentDate = new Date();
-            syncDateSelectors();
-            renderAll();
-        };
-
-        /* Checkbox Habit Toggle */
-        window.toggleHabitCompletion = function(dateStr, habitName) {
+        window.toggleHabit = function(dateStr, habitName, isChecked) {
             const p = window.activeParticipant;
             if (!window.completions[p]) window.completions[p] = {};
             if (!window.completions[p][dateStr]) window.completions[p][dateStr] = {};
 
-            const current = !!window.completions[p][dateStr][habitName];
-            window.completions[p][dateStr][habitName] = !current;
-
+            window.completions[p][dateStr][habitName] = isChecked;
             saveStateToCloud();
             renderCalendarHeaderStats();
             renderLeaderboard();
-            
             if (window.activeMainView === 'dashboard') {
-                renderDashboardCharts();
+                renderDashboard();
             }
         };
 
-        /* Body Metrics Logging */
-        window.saveBodyMetrics = function(e) {
-            e.preventDefault();
-            const dateVal = document.getElementById('metricDate').value;
-            const weightVal = parseFloat(document.getElementById('metricWeight').value);
-            const tummyVal = parseFloat(document.getElementById('metricTummy').value);
+        window.saveBodyMetrics = function(event) {
+            event.preventDefault();
+            const dateInput = document.getElementById('metricDate');
+            const weightInput = document.getElementById('metricWeight');
+            const tummyInput = document.getElementById('metricTummy');
 
-            if (!dateVal || isNaN(weightVal) || isNaN(tummyVal)) {
-                showToast("Please enter valid weight and tummy measurements.", "fa-circle-exclamation");
-                return;
-            }
+            const dVal = dateInput.value || formatDateKey(window.currentDate.getFullYear(), window.currentDate.getMonth(), window.currentDate.getDate());
+            const wVal = parseFloat(weightInput.value);
+            const tVal = parseFloat(tummyInput.value);
 
-            if (!window.bodyMetrics[window.activeParticipant]) {
-                window.bodyMetrics[window.activeParticipant] = {};
-            }
+            if (isNaN(wVal) || isNaN(tVal)) return;
 
-            window.bodyMetrics[window.activeParticipant][dateVal] = {
-                weight: weightVal,
-                tummy: tummyVal
+            const p = window.activeParticipant;
+            if (!window.bodyMetrics[p]) window.bodyMetrics[p] = {};
+
+            window.bodyMetrics[p][dVal] = {
+                weight: wVal,
+                tummy: tVal,
+                updatedAt: new Date().toISOString()
             };
 
+            weightInput.value = '';
+            tummyInput.value = '';
             saveStateToCloud();
-            showToast(`Logged body metrics for ${window.activeParticipant}!`, "fa-weight-scale");
-
-            document.getElementById('metricWeight').value = '';
-            document.getElementById('metricTummy').value = '';
-
             renderMetricsSummaryNotice();
-
             if (window.activeMainView === 'dashboard') {
-                renderDashboardCharts();
+                renderDashboard();
             }
+            showToast(`Logged body metrics for ${p} on ${dVal}`, "fa-weight-scale");
         };
 
-        function renderMetricsSummaryNotice() {
-            const summaryText = document.getElementById('totalMetricsSummaryText');
-            if (!summaryText) return;
-
-            let totalCount = 0;
-            const participantCounts = [];
-
-            Object.keys(window.bodyMetrics).forEach(p => {
-                const logs = Object.keys(window.bodyMetrics[p] || {}).length;
-                totalCount += logs;
-                if (logs > 0) {
-                    participantCounts.push(`${p}: ${logs}`);
-                }
-            });
-
-            if (totalCount === 0) {
-                summaryText.textContent = "0 total logs saved across all participants";
-            } else {
-                summaryText.textContent = `${totalCount} total log(s) [ ${participantCounts.join(' | ')} ]`;
-            }
-        }
-
-        /* UI Render Routines */
-        function renderAll() {
-            renderParticipantButtons();
-            renderHabitsList();
+        window.changeDate = function() {
+            const m = parseInt(document.getElementById('monthSelect').value);
+            const y = parseInt(document.getElementById('yearSelect').value);
+            window.currentDate = new Date(y, m, 1);
             renderCalendar();
-            renderCalendarHeaderStats();
             renderLeaderboard();
-            renderMetricsSummaryNotice();
-
-            const badge = document.getElementById('activePersonMetricLabel');
-            if (badge) badge.textContent = window.activeParticipant;
-
             if (window.activeMainView === 'dashboard') {
-                renderDashboardCharts();
-            }
-        }
-
-        function renderParticipantButtons() {
-            const container = document.getElementById('participantButtons');
-            if (!container) return;
-            container.innerHTML = '';
-
-            window.participants.forEach(p => {
-                const isActive = p === window.activeParticipant;
-                const pLogs = Object.keys(window.bodyMetrics[p] || {}).length;
-                
-                const btn = document.createElement('button');
-                btn.type = 'button';
-                btn.onclick = () => window.selectParticipant(p);
-                btn.className = `w-full text-left px-3.5 py-2.5 rounded-xl font-bold text-xs flex items-center justify-between transition cursor-pointer ${
-                    isActive 
-                        ? 'bg-indigo-600 text-white shadow-md shadow-indigo-100' 
-                        : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border border-slate-200'
-                }`;
-
-                btn.innerHTML = `
-                    <span class="flex items-center gap-2">
-                        <i class="fa-solid fa-circle-user text-sm"></i>
-                        <span>${p}</span>
-                    </span>
-                    <span class="flex items-center gap-1.5">
-                        ${pLogs > 0 ? `<span class="text-[10px] px-1.5 py-0.5 rounded-md ${isActive ? 'bg-indigo-700 text-indigo-100' : 'bg-slate-200 text-slate-600'}">${pLogs} logs</span>` : ''}
-                        ${isActive ? '<i class="fa-solid fa-check text-xs"></i>' : ''}
-                    </span>
-                `;
-                container.appendChild(btn);
-            });
-        }
-
-        function renderHabitsList() {
-            const container = document.getElementById('habitsList');
-            const countBadge = document.getElementById('habitsCount');
-            if (!container) return;
-
-            if (countBadge) countBadge.textContent = window.habits.length;
-            container.innerHTML = '';
-
-            if (window.habits.length === 0) {
-                container.innerHTML = `<li class="text-xs text-slate-400 italic py-2">No habits added yet.</li>`;
-                return;
-            }
-
-            window.habits.forEach(h => {
-                const li = document.createElement('li');
-                li.className = 'flex items-center justify-between bg-slate-50 border border-slate-200 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700';
-                li.innerHTML = `
-                    <span class="truncate">${h}</span>
-                    <button onclick="removeHabit('${h}')" class="text-slate-400 hover:text-rose-500 transition p-1 cursor-pointer" title="Delete Habit">
-                        <i class="fa-solid fa-xmark"></i>
-                    </button>
-                `;
-                container.appendChild(li);
-            });
-        }
-
-        function renderCalendar() {
-            const grid = document.getElementById('calendarDaysGrid');
-            if (!grid) return;
-            grid.innerHTML = '';
-
-            const year = window.currentDate.getFullYear();
-            const month = window.currentDate.getMonth();
-
-            const monthTitle = `${MONTH_NAMES[month]} ${year}`;
-            const headerTitle = document.getElementById('calendarHeaderTitle');
-            const headerBadge = document.getElementById('headerParticipantBadge');
-            
-            if (headerTitle) headerTitle.textContent = monthTitle;
-            if (headerBadge) headerBadge.textContent = window.activeParticipant.toUpperCase();
-
-            const firstDayIndex = new Date(year, month, 1).getDay();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-
-            const p = window.activeParticipant;
-            const pCompletions = window.completions[p] || {};
-
-            for (let i = 0; i < firstDayIndex; i++) {
-                const emptyCell = document.createElement('div');
-                emptyCell.className = 'bg-slate-50/50 border border-slate-100 rounded-xl p-2 min-h-[110px] print:bg-white print:border-slate-200';
-                grid.appendChild(emptyCell);
-            }
-
-            const today = new Date();
-            const isCurrentMonth = today.getFullYear() === year && today.getMonth() === month;
-
-            for (let day = 1; day <= totalDays; day++) {
-                const dateStr = formatDateKey(year, month, day);
-                const isToday = isCurrentMonth && today.getDate() === day;
-
-                const dayCell = document.createElement('div');
-                dayCell.className = `day-cell bg-white border rounded-xl p-2 sm:p-2.5 flex flex-col justify-between min-h-[115px] transition hover:border-slate-300 ${
-                    isToday ? 'border-indigo-500 ring-2 ring-indigo-500/20 shadow-sm' : 'border-slate-200'
-                }`;
-
-                let habitsMarkup = '';
-                const dayLogs = pCompletions[dateStr] || {};
-
-                window.habits.forEach(h => {
-                    const isChecked = !!dayLogs[h];
-                    habitsMarkup += `
-                        <label class="flex items-center gap-1.5 cursor-pointer select-none group">
-                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleHabitCompletion('${dateStr}', '${h}')" class="habit-checkbox">
-                            <span class="habit-label-text text-[10px] sm:text-xs truncate transition-colors">${h}</span>
-                        </label>
-                    `;
-                });
-
-                dayCell.innerHTML = `
-                    <div class="flex items-center justify-between mb-1.5">
-                        <span class="text-xs font-extrabold ${isToday ? 'bg-indigo-600 text-white w-5 h-5 rounded-full flex items-center justify-center' : 'text-slate-800'}">${day}</span>
-                        ${isToday ? '<span class="text-[9px] font-bold text-indigo-600 uppercase tracking-wider">Today</span>' : ''}
-                    </div>
-                    <div class="space-y-1.5 flex-grow overflow-y-auto">
-                        ${habitsMarkup}
-                    </div>
-                `;
-
-                grid.appendChild(dayCell);
-            }
-        }
-
-        function renderCalendarHeaderStats() {
-            const year = window.currentDate.getFullYear();
-            const month = window.currentDate.getMonth();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-
-            const p = window.activeParticipant;
-            const pCompletions = window.completions[p] || {};
-
-            let done = 0;
-            const totalPossible = totalDays * window.habits.length;
-
-            for (let d = 1; d <= totalDays; d++) {
-                const dateStr = formatDateKey(year, month, d);
-                const dayLogs = pCompletions[dateStr] || {};
-                window.habits.forEach(h => {
-                    if (dayLogs[h]) done++;
-                });
-            }
-
-            const pct = totalPossible > 0 ? Math.round((done / totalPossible) * 100) : 0;
-
-            const pctText = document.getElementById('completionPercentage');
-            const progressBar = document.getElementById('headerProgressBar');
-
-            if (pctText) pctText.textContent = `${pct}%`;
-            if (progressBar) progressBar.style.width = `${pct}%`;
-        }
-
-        function renderLeaderboard() {
-            const container = document.getElementById('leaderboardContainer');
-            if (!container) return;
-            container.innerHTML = '';
-
-            const year = window.currentDate.getFullYear();
-            const month = window.currentDate.getMonth();
-            const totalDays = new Date(year, month + 1, 0).getDate();
-            const totalPossible = totalDays * window.habits.length;
-
-            window.participants.forEach(p => {
-                const pCompletions = window.completions[p] || {};
-                let done = 0;
-
-                for (let d = 1; d <= totalDays; d++) {
-                    const dateStr = formatDateKey(year, month, d);
-                    const dayLogs = pCompletions[dateStr] || {};
-                    window.habits.forEach(h => {
-                        if (dayLogs[h]) done++;
-                    });
-                }
-
-                const pct = totalPossible > 0 ? Math.round((done / totalPossible) * 100) : 0;
-
-                const row = document.createElement('div');
-                row.className = 'bg-slate-50 border border-slate-200 rounded-xl p-3 space-y-1.5';
-                row.innerHTML = `
-                    <div class="flex items-center justify-between text-xs font-bold">
-                        <span class="text-slate-800">${p}</span>
-                        <span class="text-indigo-600">${pct}% (${done}/${totalPossible})</span>
-                    </div>
-                    <div class="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div class="bg-indigo-600 h-full rounded-full transition-all duration-300" style="width: ${pct}%"></div>
-                    </div>
-                `;
-                container.appendChild(row);
-            });
-        }
-
-        /* Chart Rendering */
-        window.renderDashboardCharts = function() {
-            const title = document.getElementById('dashParticipantTitle');
-            if (title) title.textContent = `${window.activeParticipant}'s Progress & Metrics Dashboard`;
-
-            const mLabel = document.getElementById('dashChartMonthLabel');
-            if (mLabel) mLabel.textContent = `${MONTH_NAMES[window.currentDate.getMonth()]} ${window.currentDate.getFullYear()}`;
-
-            const activeMetrics = window.bodyMetrics[window.activeParticipant] || {};
-            const loggedDates = Object.keys(activeMetrics).sort();
-
-            const countBadge = document.getElementById('dashMetricCount');
-            if (countBadge) countBadge.textContent = `${loggedDates.length} body logs`;
-
-            /* CHART 1: Weight Progression Line Chart */
-            const ctxWeight = document.getElementById('weightMetricsChart')?.getContext('2d');
-            if (ctxWeight) {
-                if (weightChartInstance) weightChartInstance.destroy();
-
-                const weights = loggedDates.map(d => activeMetrics[d]?.weight ?? null);
-
-                weightChartInstance = new Chart(ctxWeight, {
-                    type: 'line',
-                    data: {
-                        labels: loggedDates.length > 0 ? loggedDates : ['No Data Logged'],
-                        datasets: [
-                            {
-                                label: 'Weight (lbs)',
-                                data: loggedDates.length > 0 ? weights : [0],
-                                borderColor: '#4f46e5',
-                                backgroundColor: '#818cf8',
-                                borderWidth: 3,
-                                fill: false,
-                                tension: 0.35,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#4f46e5',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                spanGaps: true
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: { mode: 'index', intersect: false },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    font: { family: 'Inter', size: 12, weight: '600' },
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: '#0f172a',
-                                titleFont: { family: 'Inter', size: 12, weight: 'bold' },
-                                bodyFont: { family: 'Inter', size: 12 },
-                                padding: 10,
-                                cornerRadius: 8
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: { display: false },
-                                ticks: { font: { family: 'Inter', size: 11 } }
-                            },
-                            y: {
-                                type: 'linear',
-                                display: true,
-                                grace: '10%',
-                                title: { 
-                                    display: true, 
-                                    text: 'Weight (lbs)',
-                                    color: '#4f46e5',
-                                    font: { family: 'Inter', weight: 'bold', size: 11 }
-                                },
-                                ticks: { color: '#4f46e5', font: { family: 'Inter', size: 11 } },
-                                grid: { color: '#f1f5f9' }
-                            }
-                        }
-                    }
-                });
-            }
-
-            /* CHART 2: Tummy Size Line Chart */
-            const ctxTummy = document.getElementById('tummyMetricsChart')?.getContext('2d');
-            if (ctxTummy) {
-                if (tummyChartInstance) tummyChartInstance.destroy();
-
-                const tummies = loggedDates.map(d => activeMetrics[d]?.tummy ?? null);
-
-                tummyChartInstance = new Chart(ctxTummy, {
-                    type: 'line',
-                    data: {
-                        labels: loggedDates.length > 0 ? loggedDates : ['No Data Logged'],
-                        datasets: [
-                            {
-                                label: 'Tummy Size (in)',
-                                data: loggedDates.length > 0 ? tummies : [0],
-                                borderColor: '#f43f5e',
-                                backgroundColor: '#fb7185',
-                                borderWidth: 3,
-                                fill: false,
-                                tension: 0.35,
-                                pointRadius: 5,
-                                pointHoverRadius: 8,
-                                pointBackgroundColor: '#f43f5e',
-                                pointBorderColor: '#ffffff',
-                                pointBorderWidth: 2,
-                                spanGaps: true
-                            }
-                        ]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        interaction: { mode: 'index', intersect: false },
-                        plugins: {
-                            legend: {
-                                display: true,
-                                position: 'top',
-                                labels: {
-                                    usePointStyle: true,
-                                    font: { family: 'Inter', size: 12, weight: '600' },
-                                    padding: 15
-                                }
-                            },
-                            tooltip: {
-                                backgroundColor: '#0f172a',
-                                titleFont: { family: 'Inter', size: 12, weight: 'bold' },
-                                bodyFont: { family: 'Inter', size: 12 },
-                                padding: 10,
-                                cornerRadius: 8
-                            }
-                        },
-                        scales: {
-                            x: {
-                                grid: { display: false },
-                                ticks: { font: { family: 'Inter', size: 11 } }
-                            },
-                            y: {
-                                type: 'linear',
-                                display: true,
-                                grace: '10%',
-                                title: { 
-                                    display: true, 
-                                    text: 'Tummy Size (in)',
-                                    color: '#f43f5e',
-                                    font: { family: 'Inter', weight: 'bold', size: 11 }
-                                },
-                                ticks: { color: '#f43f5e', font: { family: 'Inter', size: 11 } },
-                                grid: { color: '#f1f5f9' }
-                            }
-                        }
-                    }
-                });
-            }
-
-            /* CHART 3: DAILY HABIT CONSISTENCY */
-            const ctxConsistency = document.getElementById('habitConsistencyChart')?.getContext('2d');
-            if (ctxConsistency) {
-                if (consistencyChartInstance) consistencyChartInstance.destroy();
-
-                const year = window.currentDate.getFullYear();
-                const month = window.currentDate.getMonth();
-                const totalDays = new Date(year, month + 1, 0).getDate();
-
-                const labels = [];
-                const dataValues = [];
-                const p = window.activeParticipant;
-                const pCompletions = window.completions[p] || {};
-
-                for (let d = 1; d <= totalDays; d++) {
-                    labels.push(`Day ${d}`);
-                    const dateStr = formatDateKey(year, month, d);
-                    const dayLogs = pCompletions[dateStr] || {};
-                    let count = 0;
-                    window.habits.forEach(h => { if (dayLogs[h]) count++; });
-                    dataValues.push(count);
-                }
-
-                consistencyChartInstance = new Chart(ctxConsistency, {
-                    type: 'bar',
-                    data: {
-                        labels: labels,
-                        datasets: [{
-                            label: 'Completed Habits',
-                            data: dataValues,
-                            backgroundColor: '#6366f1',
-                            borderRadius: 4,
-                            hoverBackgroundColor: '#4f46e5'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: { display: false },
-                            tooltip: {
-                                backgroundColor: '#0f172a',
-                                titleFont: { family: 'Inter', size: 12, weight: 'bold' },
-                                bodyFont: { family: 'Inter', size: 12 },
-                                padding: 10,
-                                cornerRadius: 8
-                            }
-                        },
-                        scales: {
-                            x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 10 } } },
-                            y: {
-                                beginAtZero: true,
-                                max: Math.max(window.habits.length, 1),
-                                ticks: { stepSize: 1, font: { family: 'Inter', size: 11 } },
-                                grid: { color: '#f1f5f9' }
-                            }
-                        }
-                    }
-                });
-            }
-
-            /* CHART 3: Habit Completion Breakdown Doughnut Chart */
-            const ctxBreakdown = document.getElementById('habitBreakdownChart')?.getContext('2d');
-            if (ctxBreakdown) {
-                if (breakdownChartInstance) breakdownChartInstance.destroy();
-
-                const year = window.currentDate.getFullYear();
-                const month = window.currentDate.getMonth();
-                const totalDays = new Date(year, month + 1, 0).getDate();
-                const p = window.activeParticipant;
-                const pCompletions = window.completions[p] || {};
-
-                const habitCounts = {};
-                window.habits.forEach(h => { habitCounts[h] = 0; });
-
-                for (let d = 1; d <= totalDays; d++) {
-                    const dateStr = formatDateKey(year, month, d);
-                    const dayLogs = pCompletions[dateStr] || {};
-                    window.habits.forEach(h => { if (dayLogs[h]) habitCounts[h]++; });
-                }
-
-                const colors = ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#8b5cf6', '#14b8a6'];
-
-                breakdownChartInstance = new Chart(ctxBreakdown, {
-                    type: 'doughnut',
-                    data: {
-                        labels: window.habits,
-                        datasets: [{
-                            data: window.habits.map(h => habitCounts[h]),
-                            backgroundColor: colors.slice(0, window.habits.length),
-                            borderWidth: 2,
-                            borderColor: '#ffffff'
-                        }]
-                    },
-                    options: {
-                        responsive: true,
-                        maintainAspectRatio: false,
-                        plugins: {
-                            legend: {
-                                position: 'right',
-                                labels: { font: { family: 'Inter', size: 12, weight: '600' }, padding: 12 }
-                            },
-                            tooltip: {
-                                backgroundColor: '#0f172a',
-                                titleFont: { family: 'Inter', size: 12, weight: 'bold' },
-                                bodyFont: { family: 'Inter', size: 12 },
-                                padding: 10,
-                                cornerRadius: 8
-                            }
-                        },
-                        cutout: '65%'
-                    }
-                });
+                renderDashboard();
             }
         };
 
-        /* Modal & Reset Controls */
+        window.navigateMonth = function(delta) {
+            const m = window.currentDate.getMonth();
+            const y = window.currentDate.getFullYear();
+            window.currentDate = new Date(y, m + delta, 1);
+            updateNavigatorDropdowns();
+            renderCalendar();
+            renderLeaderboard();
+            if (window.activeMainView === 'dashboard') {
+                renderDashboard();
+            }
+        };
+
+        window.goToCurrentMonth = function() {
+            window.currentDate = new Date();
+            updateNavigatorDropdowns();
+            renderCalendar();
+            renderLeaderboard();
+            if (window.activeMainView === 'dashboard') {
+                renderDashboard();
+            }
+        };
+
+        function updateNavigatorDropdowns() {
+            const mSelect = document.getElementById('monthSelect');
+            const ySelect = document.getElementById('yearSelect');
+            if (mSelect) mSelect.value = window.currentDate.getMonth();
+            if (ySelect) ySelect.value = window.currentDate.getFullYear();
+        }
+
+        /* Reset Operations */
         window.triggerResetConfirmModal = function() {
             const modal = document.getElementById('modalOverlay');
             const box = document.getElementById('modalBox');
-            const err = document.getElementById('resetPasswordError');
-            const pwd = document.getElementById('resetPasswordInput');
+            const passInput = document.getElementById('resetPasswordInput');
+            const errText = document.getElementById('resetPasswordError');
 
-            if (err) err.classList.add('hidden');
-            if (pwd) pwd.value = '';
+            if (passInput) passInput.value = '';
+            if (errText) errText.classList.add('hidden');
 
             if (modal && box) {
                 modal.classList.remove('hidden');
                 setTimeout(() => {
                     box.classList.remove('scale-95', 'opacity-0');
+                    if (passInput) passInput.focus();
                 }, 10);
             }
         };
@@ -1871,11 +1401,12 @@
         };
 
         window.executeReset = function() {
-            const pwdInput = document.getElementById('resetPasswordInput');
-            const pwdErr = document.getElementById('resetPasswordError');
+            const passInput = document.getElementById('resetPasswordInput');
+            const errText = document.getElementById('resetPasswordError');
+            const val = passInput ? passInput.value.trim() : '';
 
-            if (!pwdInput || pwdInput.value !== '123456') {
-                if (pwdErr) pwdErr.classList.remove('hidden');
+            if (val !== '123456') {
+                if (errText) errText.classList.remove('hidden');
                 return;
             }
 
@@ -1886,111 +1417,474 @@
             window.bodyMetrics = {};
 
             saveStateToCloud();
-            renderAll();
             closeConfirmModal();
-            showToast("System reset completed successfully!", "fa-trash-can");
+            renderAll();
+            showToast("Tracker state fully reset to default!", "fa-trash-can");
         };
 
-        /* Initialization */
-        window.onload = function() {
-            /* Ensure state is restored synchronously before initial render */
-            loadFallbackLocalState();
-            populateYearSelect();
-            syncDateSelectors();
+        /* Render Functions */
+        function renderParticipants() {
+            const container = document.getElementById('participantButtons');
+            if (!container) return;
 
-            /* Set metric log date input to today */
-            const todayStr = new Date().toISOString().slice(0, 10);
-            const mDate = document.getElementById('metricDate');
-            if (mDate) mDate.value = todayStr;
+            container.innerHTML = '';
+            window.participants.forEach(p => {
+                const isActive = p === window.activeParticipant;
+                const btn = document.createElement('button');
+                btn.onclick = () => window.selectParticipant(p);
+                btn.className = isActive 
+                    ? 'w-full bg-indigo-600 text-white font-bold text-xs py-2.5 px-3 rounded-xl shadow-md shadow-indigo-100 flex items-center justify-between transition cursor-pointer'
+                    : 'w-full bg-slate-50 hover:bg-slate-100 text-slate-700 font-bold text-xs py-2.5 px-3 rounded-xl transition flex items-center justify-between border border-slate-200/80 cursor-pointer';
+
+                btn.innerHTML = `
+                    <span class="flex items-center gap-2">
+                        <i class="fa-solid fa-user text-xs ${isActive ? 'text-indigo-200' : 'text-slate-400'}"></i>
+                        ${p}
+                    </span>
+                    ${isActive ? '<i class="fa-solid fa-circle-check text-xs text-white"></i>' : ''}
+                `;
+                container.appendChild(btn);
+            });
+
+            const activeLabel = document.getElementById('activePersonMetricLabel');
+            if (activeLabel) activeLabel.textContent = window.activeParticipant;
+        }
+
+        function renderHabitsList() {
+            const container = document.getElementById('habitsList');
+            const countBadge = document.getElementById('habitsCount');
+            if (!container) return;
+
+            if (countBadge) countBadge.textContent = window.habits.length;
+            container.innerHTML = '';
+
+            window.habits.forEach(h => {
+                const li = document.createElement('li');
+                li.className = 'flex items-center justify-between bg-slate-50 border border-slate-200/70 px-3 py-2 rounded-xl text-xs font-semibold text-slate-700';
+                li.innerHTML = `
+                    <span class="flex items-center gap-2 truncate pr-2">
+                        <i class="fa-solid fa-check text-indigo-500 text-[10px]"></i>
+                        ${h}
+                    </span>
+                    <button onclick="deleteHabit('${h}')" class="text-slate-400 hover:text-rose-600 transition p-1" title="Delete Habit">
+                        <i class="fa-solid fa-xmark"></i>
+                    </button>
+                `;
+                container.appendChild(li);
+            });
+        }
+
+        function renderMetricsSummaryNotice() {
+            const text = document.getElementById('totalMetricsSummaryText');
+            if (!text) return;
+
+            let totalCount = 0;
+            Object.values(window.bodyMetrics).forEach(userLogs => {
+                if (userLogs) totalCount += Object.keys(userLogs).length;
+            });
+
+            const activeLogs = window.bodyMetrics[window.activeParticipant] ? Object.keys(window.bodyMetrics[window.activeParticipant]).length : 0;
+            text.textContent = `${activeLogs} logs for ${window.activeParticipant} (${totalCount} total in family)`;
+        }
+
+        function renderCalendarHeaderStats() {
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const monthName = MONTH_NAMES[month];
+            const p = window.activeParticipant;
+
+            const title = document.getElementById('calendarHeaderTitle');
+            const badge = document.getElementById('headerParticipantBadge');
+            const printTitle = document.getElementById('printTitle');
+            
+            if (title) title.textContent = `${monthName} ${year}`;
+            if (badge) badge.textContent = p.toUpperCase();
+            if (printTitle) printTitle.textContent = `${p}'s Habit Tracker`;
+
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const userCompletions = window.completions[p] || {};
+            let completedCount = 0;
+            const totalPossible = totalDays * window.habits.length;
+
+            for (let d = 1; d <= totalDays; d++) {
+                const dStr = formatDateKey(year, month, d);
+                const dayData = userCompletions[dStr] || {};
+                window.habits.forEach(h => { if (dayData[h]) completedCount++; });
+            }
+
+            const pct = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
+            const pctText = document.getElementById('completionPercentage');
+            const bar = document.getElementById('headerProgressBar');
+            const printStats = document.getElementById('printStats');
+
+            if (pctText) pctText.textContent = `${pct}%`;
+            if (bar) bar.style.width = `${pct}%`;
+            if (printStats) printStats.textContent = `Completion: ${pct}%`;
+        }
+
+        function renderCalendar() {
+            const grid = document.getElementById('calendarDaysGrid');
+            if (!grid) return;
+
+            grid.innerHTML = '';
+            renderCalendarHeaderStats();
+
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const firstDayIndex = new Date(year, month, 1).getDay();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+
+            const today = new Date();
+            const isCurrentMonthYear = today.getFullYear() === year && today.getMonth() === month;
+            const todayDate = today.getDate();
+
+            const p = window.activeParticipant;
+            const userCompletions = window.completions[p] || {};
+
+            // Render empty padded cells before 1st day of month
+            for (let i = 0; i < firstDayIndex; i++) {
+                const emptyCell = document.createElement('div');
+                emptyCell.className = 'bg-slate-50/50 border border-slate-100 rounded-xl p-2 min-h-[105px] print:bg-white print:border-slate-300';
+                grid.appendChild(emptyCell);
+            }
+
+            // Render active month days
+            for (let d = 1; d <= totalDays; d++) {
+                const dateStr = formatDateKey(year, month, d);
+                const dayData = userCompletions[dateStr] || {};
+                const isToday = isCurrentMonthYear && d === todayDate;
+
+                const cell = document.createElement('div');
+                cell.className = `day-cell relative bg-white border ${isToday ? 'border-indigo-500 ring-2 ring-indigo-100' : 'border-slate-200'} rounded-xl sm:rounded-2xl p-1.5 sm:p-2.5 flex flex-col justify-between min-h-[90px] sm:min-h-[110px] transition hover:border-indigo-300 shadow-sm`;
+
+                let habitsChecklistHtml = '';
+                window.habits.forEach(h => {
+                    const isChecked = !!dayData[h];
+                    habitsChecklistHtml += `
+                        <label class="flex items-center gap-1 sm:gap-1.5 cursor-pointer select-none group py-0.5">
+                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleHabit('${dateStr}', '${h}', this.checked)" class="habit-checkbox">
+                            <span class="habit-label-text text-[9px] sm:text-xs tracking-tight truncate">${h}</span>
+                        </label>
+                    `;
+                });
+
+                cell.innerHTML = `
+                    <div class="flex items-center justify-between border-b border-slate-100 pb-1 mb-1 sm:pb-1.5 sm:mb-1.5">
+                        <span class="font-black text-[11px] sm:text-sm ${isToday ? 'text-indigo-600 bg-indigo-50 px-1.5 py-0.5 rounded-lg' : 'text-slate-800'}">${d}</span>
+                        ${isToday ? '<span class="text-[8px] sm:text-[9px] font-bold text-indigo-500 uppercase tracking-wider hidden xs:inline">Today</span>' : ''}
+                    </div>
+                    <div class="space-y-0.5 flex-grow">
+                        ${habitsChecklistHtml}
+                    </div>
+                `;
+
+                grid.appendChild(cell);
+            }
+        }
+
+        function renderLeaderboard() {
+            const container = document.getElementById('leaderboardContainer');
+            if (!container) return;
+
+            container.innerHTML = '';
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const totalDays = new Date(year, month + 1, 0).getDate();
+            const totalPossible = totalDays * (window.habits.length || 1);
+
+            const scores = window.participants.map(p => {
+                const pCompletions = window.completions[p] || {};
+                let count = 0;
+                for (let d = 1; d <= totalDays; d++) {
+                    const dStr = formatDateKey(year, month, d);
+                    const dayData = pCompletions[dStr] || {};
+                    window.habits.forEach(h => { if (dayData[h]) count++; });
+                }
+                const pct = totalPossible > 0 ? Math.round((count / totalPossible) * 100) : 0;
+                return { name: p, count, pct };
+            });
+
+            scores.sort((a, b) => b.pct - a.pct);
+
+            scores.forEach((s, idx) => {
+                const isActive = s.name === window.activeParticipant;
+                const div = document.createElement('div');
+                div.className = `p-3 rounded-xl border ${isActive ? 'bg-indigo-50/50 border-indigo-200' : 'bg-slate-50 border-slate-100'} flex items-center justify-between`;
+                div.innerHTML = `
+                    <div class="flex items-center gap-2.5">
+                        <span class="w-5 h-5 rounded-full ${idx === 0 ? 'bg-amber-400 text-white' : 'bg-slate-200 text-slate-600'} text-[10px] font-black flex items-center justify-center">${idx + 1}</span>
+                        <div>
+                            <span class="text-xs font-bold text-slate-800 block">${s.name}</span>
+                            <span class="text-[10px] text-slate-400 block">${s.count} tasks done</span>
+                        </div>
+                    </div>
+                    <span class="text-xs font-extrabold ${isActive ? 'text-indigo-600' : 'text-slate-700'}">${s.pct}%</span>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        /* Chart Dashboard Visualization */
+        function renderDashboard() {
+            const p = window.activeParticipant;
+            const title = document.getElementById('dashParticipantTitle');
+            const countLabel = document.getElementById('dashMetricCount');
+            const monthLabel = document.getElementById('dashChartMonthLabel');
+
+            const year = window.currentDate.getFullYear();
+            const month = window.currentDate.getMonth();
+            const monthName = MONTH_NAMES[month];
+
+            if (title) title.textContent = `${p}'s Fitness & Task Dashboard`;
+            if (monthLabel) monthLabel.textContent = `${monthName} ${year}`;
+
+            const pMetrics = window.bodyMetrics[p] || {};
+            const sortedDates = Object.keys(pMetrics).sort();
+            if (countLabel) countLabel.textContent = `${sortedDates.length} logs`;
+
+            const weightCanvas = document.getElementById('weightMetricsChart');
+            const tummyCanvas = document.getElementById('tummyMetricsChart');
+            const bodyCanvas = document.getElementById('bodyMetricsChart');
+            const consistencyCanvas = document.getElementById('habitConsistencyChart');
+            const breakdownCanvas = document.getElementById('habitBreakdownChart');
+
+            /* 1. Weight Progression Chart */
+            if (weightCanvas) {
+                if (weightChartInstance) weightChartInstance.destroy();
+                const wLabels = sortedDates;
+                const wData = sortedDates.map(d => pMetrics[d].weight);
+
+                weightChartInstance = new Chart(weightCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: wLabels.length > 0 ? wLabels : ['No Logs'],
+                        datasets: [{
+                            label: 'Weight (lbs)',
+                            data: wData.length > 0 ? wData : [0],
+                            borderColor: '#4f46e5',
+                            backgroundColor: 'rgba(79, 70, 229, 0.1)',
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            /* 2. Tummy Size Progression Chart */
+            if (tummyCanvas) {
+                if (tummyChartInstance) tummyChartInstance.destroy();
+                const tLabels = sortedDates;
+                const tData = sortedDates.map(d => pMetrics[d].tummy);
+
+                tummyChartInstance = new Chart(tummyCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: tLabels.length > 0 ? tLabels : ['No Logs'],
+                        datasets: [{
+                            label: 'Tummy (in)',
+                            data: tData.length > 0 ? tData : [0],
+                            borderColor: '#f43f5e',
+                            backgroundColor: 'rgba(244, 63, 94, 0.1)',
+                            borderWidth: 2.5,
+                            fill: true,
+                            tension: 0.3
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+
+            /* 3. Dual Body Metrics Chart */
+            if (bodyCanvas) {
+                if (bodyMetricsChartInstance) bodyMetricsChartInstance.destroy();
+                const bLabels = sortedDates;
+                const bWeight = sortedDates.map(d => pMetrics[d].weight);
+                const bTummy = sortedDates.map(d => pMetrics[d].tummy);
+
+                bodyMetricsChartInstance = new Chart(bodyCanvas.getContext('2d'), {
+                    type: 'line',
+                    data: {
+                        labels: bLabels.length > 0 ? bLabels : ['No Logs'],
+                        datasets: [
+                            {
+                                label: 'Weight (lbs)',
+                                data: bWeight.length > 0 ? bWeight : [0],
+                                borderColor: '#6366f1',
+                                yAxisID: 'yWeight',
+                                tension: 0.3
+                            },
+                            {
+                                label: 'Tummy (in)',
+                                data: bTummy.length > 0 ? bTummy : [0],
+                                borderColor: '#f43f5e',
+                                yAxisID: 'yTummy',
+                                tension: 0.3
+                            }
+                        ]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            yWeight: { type: 'linear', position: 'left', title: { display: true, text: 'Weight (lbs)' } },
+                            yTummy: { type: 'linear', position: 'right', title: { display: true, text: 'Tummy (in)' }, grid: { drawOnChartArea: false } }
+                        }
+                    }
+                });
+            }
+
+            /* 4. Daily Habit Consistency Bar Chart */
+            if (consistencyCanvas) {
+                if (consistencyChartInstance) consistencyChartInstance.destroy();
+                const totalDays = new Date(year, month + 1, 0).getDate();
+                const dayLabels = Array.from({ length: totalDays }, (_, i) => String(i + 1));
+                const userCompletions = window.completions[p] || {};
+
+                const consistencyData = dayLabels.map(d => {
+                    const dStr = formatDateKey(year, month, parseInt(d));
+                    const dayData = userCompletions[dStr] || {};
+                    let count = 0;
+                    window.habits.forEach(h => { if (dayData[h]) count++; });
+                    return count;
+                });
+
+                consistencyChartInstance = new Chart(consistencyCanvas.getContext('2d'), {
+                    type: 'bar',
+                    data: {
+                        labels: dayLabels,
+                        datasets: [{
+                            label: 'Habits Executed',
+                            data: consistencyData,
+                            backgroundColor: '#818cf8',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: { y: { beginAtZero: true, max: Math.max(window.habits.length, 1) } }
+                    }
+                });
+            }
+
+            /* 5. Habit Completion Comparison Breakdown (Doughnut) */
+            if (breakdownCanvas) {
+                if (breakdownChartInstance) breakdownChartInstance.destroy();
+                const totalDays = new Date(year, month + 1, 0).getDate();
+                const userCompletions = window.completions[p] || {};
+
+                const habitTotals = window.habits.map(h => {
+                    let total = 0;
+                    for (let d = 1; d <= totalDays; d++) {
+                        const dStr = formatDateKey(year, month, d);
+                        if (userCompletions[dStr] && userCompletions[dStr][h]) total++;
+                    }
+                    return total;
+                });
+
+                breakdownChartInstance = new Chart(breakdownCanvas.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: window.habits,
+                        datasets: [{
+                            data: habitTotals,
+                            backgroundColor: ['#6366f1', '#10b981', '#f59e0b', '#ec4899', '#3b82f6', '#8b5cf6']
+                        }]
+                    },
+                    options: { responsive: true, maintainAspectRatio: false }
+                });
+            }
+        }
+
+        function renderAll() {
+            renderParticipants();
+            renderHabitsList();
+            renderMetricsSummaryNotice();
+            updateNavigatorDropdowns();
+            renderCalendar();
+            renderLeaderboard();
+            if (window.activeMainView === 'dashboard') {
+                renderDashboard();
+            }
+        }
+
+        /* Firebase & App Initialization Workflow */
+        async function initializeApplication() {
+            // Pre-fill date inputs
+            const dateInput = document.getElementById('metricDate');
+            if (dateInput) {
+                dateInput.value = formatDateKey(window.currentDate.getFullYear(), window.currentDate.getMonth(), window.currentDate.getDate());
+            }
+
+            // Populate year select
+            const yearSelect = document.getElementById('yearSelect');
+            if (yearSelect) {
+                const currentY = new Date().getFullYear();
+                yearSelect.innerHTML = '';
+                for (let y = currentY - 3; y <= currentY + 3; y++) {
+                    const opt = document.createElement('option');
+                    opt.value = y;
+                    opt.textContent = y;
+                    if (y === window.currentDate.getFullYear()) opt.selected = true;
+                    yearSelect.appendChild(opt);
+                }
+            }
 
             renderAll();
 
-            /* Attempt Firebase Initialize in background */
+            // Firebase Connect Attempt
             if (firebaseConfig) {
                 try {
                     const app = initializeApp(firebaseConfig);
-                    auth = getAuth(app);
                     db = getFirestore(app);
+                    auth = getAuth(app);
 
-                    const connectAuth = async () => {
-                        try {
-                            if (initialAuthToken) {
-                                await signInWithCustomToken(auth, initialAuthToken);
-                            } else {
-                                await signInAnonymously(auth);
-                            }
-                        } catch (tokenErr) {
-                            console.warn("Custom token failed, falling back to anonymous auth:", tokenErr);
-                            await signInAnonymously(auth);
-                        }
-                    };
+                    if (initialAuthToken) {
+                        await signInWithCustomToken(auth, initialAuthToken);
+                    } else {
+                        await signInAnonymously(auth);
+                    }
 
-                    connectAuth().then(() => {
-                        onAuthStateChanged(auth, (user) => {
-                            if (user) {
-                                userId = user.uid;
-                                setupRealtimeSync();
-                            } else {
+                    onAuthStateChanged(auth, (user) => {
+                        if (user) {
+                            userId = user.uid;
+                            updateCloudStatusBadge(true, "Cloud Connected");
+                            
+                            // Rule 1 & Rule 2: Simple snapshot query on public data path
+                            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'habitTracker', 'currentState');
+                            onSnapshot(docRef, (snapshot) => {
+                                if (snapshot.exists() && !isSaving) {
+                                    const data = snapshot.data();
+                                    if (data.habits) window.habits = data.habits;
+                                    if (data.participants) window.participants = data.participants;
+                                    if (data.completions) window.completions = data.completions;
+                                    if (data.bodyMetrics) window.bodyMetrics = data.bodyMetrics;
+                                    if (data.activeParticipant && window.participants.includes(data.activeParticipant)) {
+                                        window.activeParticipant = data.activeParticipant;
+                                    }
+                                    migrateHabitNameInCompletions();
+                                    saveFallbackLocalState();
+                                    renderAll();
+                                }
+                            }, (error) => {
+                                console.warn("Firestore snapshot error:", error);
                                 updateCloudStatusBadge(false, "Local Safe Mode");
-                            }
-                        });
-                    }).catch(err => {
-                        console.warn("Firebase Auth bypassed, using local safe mode:", err);
-                        updateCloudStatusBadge(false, "Local Safe Mode");
+                            });
+                        }
                     });
-                } catch (e) {
-                    console.warn("Firebase Config exception, running offline mode:", e);
+                } catch (err) {
+                    console.warn("Firebase initialization skipped, using resilient local storage.", err);
                     updateCloudStatusBadge(false, "Local Safe Mode");
                 }
             } else {
                 updateCloudStatusBadge(false, "Local Safe Mode");
             }
-        };
-
-        function setupRealtimeSync() {
-            if (!db || !auth || !auth.currentUser) return;
-
-            // Rule 1: Strict path /artifacts/{appId}/public/data/{collectionName}/{documentId}
-            const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'habitTracker', 'currentState');
-            
-            onSnapshot(docRef, (snapshot) => {
-                if (isSaving) return;
-                
-                if (snapshot.exists()) {
-                    const data = snapshot.data();
-                    
-                    // Smart merge cloud data with local memory to prevent data loss
-                    if (data.habits && Array.isArray(data.habits) && data.habits.length > 0) {
-                        const habitsSet = new Set([...window.habits, ...data.habits]);
-                        window.habits = Array.from(habitsSet);
-                    }
-                    if (data.participants && Array.isArray(data.participants) && data.participants.length > 0) {
-                        const participantsSet = new Set([...window.participants, ...data.participants]);
-                        window.participants = Array.from(participantsSet);
-                    }
-                    if (data.completions) {
-                        window.completions = mergeDataObjects(data.completions, window.completions);
-                    }
-                    if (data.bodyMetrics) {
-                        window.bodyMetrics = mergeDataObjects(data.bodyMetrics, window.bodyMetrics);
-                    }
-                    if (data.activeParticipant && window.participants.includes(data.activeParticipant)) {
-                        window.activeParticipant = data.activeParticipant;
-                    }
-
-                    migrateHabitNameInCompletions();
-                    saveFallbackLocalState();
-                    renderAll();
-                    updateCloudStatusBadge(true, "Cloud Synced");
-                } else {
-                    // Initial write if document doesn't exist yet
-                    saveStateToCloud();
-                }
-            }, (err) => {
-                console.warn("Realtime snapshot listener error, maintaining local state:", err);
-                updateCloudStatusBadge(false, "Local Safe Mode");
-            });
         }
+
+        // Initialize App on DOM Ready
+        window.addEventListener('DOMContentLoaded', initializeApplication);
     </script>
 </body>
 </html>

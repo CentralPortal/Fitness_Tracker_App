@@ -1,0 +1,371 @@
+{
+  "habits": [
+    "Fat Burn",
+    "Junk Snack",
+    "Weight",
+    "Low Carb Meal",
+    "EAM"
+  ],
+  "participants": [
+    "Emily",
+    "Dad",
+    "Stephanie"
+  ],
+  "activeParticipant": "Dad",
+  "completions": {
+    "Emily": {
+      "2026-08-17": {
+        "EAM": true,
+        "Fat Burn": true
+      },
+      "2026-08-07": {
+        "EAM": true
+      },
+      "2026-08-18": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Weight": true
+      },
+      "2026-08-08": {
+        "EAM": true,
+        "Fat Burn": true
+      },
+      "2026-08-19": {
+        "Fat Burn": true
+      },
+      "2026-08-09": {
+        "EAM": true,
+        "Fat Burn": true
+      },
+      "2026-08-20": {
+        "EAM": true,
+        "Fat Burn": true
+      },
+      "2026-08-10": {
+        "EAM": true,
+        "Fat Burn": true
+      },
+      "2026-08-21": {
+        "EAM": false,
+        "Low Carb Meal": false,
+        "Fat Burn": true
+      },
+      "2026-08-11": {
+        "EAM": true
+      },
+      "2026-08-01": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-23": {
+        "EAM": true
+      },
+      "2026-08-02": {
+        "EAM": true,
+        "Fat Burn": true
+      },
+      "2026-08-24": {
+        "EAM": true,
+        "Low Carb Meal": false,
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-03": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-25": {
+        "Fat Burn": false
+      },
+      "2026-08-16": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true
+      }
+    },
+    "Stephanie": {
+      "2026-08-06": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-17": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Weight": true
+      },
+      "2026-08-07": {
+        "EAM": true,
+        "Fat Burn": true
+      },
+      "2026-08-18": {
+        "EAM": true,
+        "Low Carb Meal": false,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-08": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": false
+      },
+      "2026-08-19": {
+        "EAM": true,
+        "Junk Snack": true
+      },
+      "2026-08-09": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-10": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-11": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-01": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": false
+      },
+      "2026-08-12": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Junk Snack": true,
+        "Weight": false
+      },
+      "2026-08-02": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Junk Snack": false,
+        "Weight": false
+      },
+      "2026-08-03": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-04": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Junk Snack": true
+      },
+      "2026-08-05": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Junk Snack": true,
+        "Weight": true
+      }
+    },
+    "Dad": {
+      "2026-08-17": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-18": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-19": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-20": {
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-21": {
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-22": {
+        "EAM": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-01": {
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-23": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-02": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-24": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-03": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-25": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-04": {
+        "EAM": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-05": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Weight": true
+      },
+      "2026-08-06": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Weight": true
+      },
+      "2026-08-07": {
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-08": {
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-09": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-10": {
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-11": {
+        "EAM": true,
+        "Fat Burn": true,
+        "Weight": true
+      },
+      "2026-08-12": {
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-13": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-14": {
+        "EAM": true,
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-15": {
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-16": {
+        "Low Carb Meal": true,
+        "Fat Burn": true,
+        "Junk Snack": true,
+        "Weight": true
+      },
+      "2026-08-26": {
+        "Fat Burn": true,
+        "Weight": true,
+        "Junk Snack": true
+      },
+      "2026-08-27": {
+        "EAM": true
+      },
+      "2026-08-28": {
+        "Fat Burn": true,
+        "Junk Snack": true
+      },
+      "2026-08-29": {
+        "Fat Burn": true,
+        "EAM": true,
+        "Junk Snack": true
+      },
+      "2026-08-30": {
+        "Fat Burn": true
+      }
+    }
+  },
+  "bodyMetrics": {
+    "Emily": {
+      "2026-08-04": {
+        "tummy": 37,
+        "weight": 146.8
+      }
+    },
+    "Stephanie": {
+      "2026-08-02": {
+        "tummy": 44,
+        "weight": 246.4
+      }
+    },
+    "Dad": {
+      "2026-08-01": {
+        "tummy": 37,
+        "weight": 164
+      },
+      "2026-08-29": {
+        "tummy": 37,
+        "weight": 161,
+        "updatedAt": "2026-08-29T14:45:36.966Z"
+      }
+    }
+  },
+  "exportedAt": "2026-08-30T12:01:23.022Z"
+}
