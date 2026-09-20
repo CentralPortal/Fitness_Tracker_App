@@ -35,65 +35,48 @@
             background: #94a3b8;
         }
 
-        /* Custom Checkbox Design */
-        .habit-checkbox {
-            appearance: none;
-            -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
-            border-radius: 4px;
+        /* Custom Tri-State Habit Status Badge Design */
+        .habit-status-btn {
+            width: 18px;
+            height: 18px;
+            border-radius: 5px;
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-            outline: none;
+            font-size: 10px;
+            font-weight: 900;
+            line-height: 1;
             flex-shrink: 0;
+            transition: all 0.2s ease;
+            cursor: pointer;
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
         }
 
-        /* Unchecked Habit State: Red Background with White 'X' */
-        .habit-checkbox:not(:checked) {
-            background-color: #ef4444;
-            border: 1px solid #dc2626;
+        /* Blank Default State */
+        .habit-status-btn.status-blank {
+            background-color: #ffffff;
+            border: 1.5px solid #cbd5e1;
+        }
+        .habit-status-btn.status-blank:hover {
+            border-color: #6366f1;
+            background-color: #f8fafc;
         }
 
-        .habit-checkbox:not(:checked)::after {
-            content: "✕";
-            color: #ffffff;
-            font-size: 10px;
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        /* Checked Habit State: Green Background with White Checkmark */
-        .habit-checkbox:checked {
+        /* Completed State: Green Background with White Checkmark */
+        .habit-status-btn.status-completed {
             background-color: #10b981;
-            border: 1px solid #059669;
+            border: 1.5px solid #059669;
+            color: #ffffff;
             animation: pop 0.2s ease-in-out;
         }
 
-        .habit-checkbox:checked::after {
-            content: "✓";
+        /* Failed State: Red Background with White 'X' */
+        .habit-status-btn.status-failed {
+            background-color: #ef4444;
+            border: 1.5px solid #dc2626;
             color: #ffffff;
-            font-size: 11px;
-            font-weight: 900;
-            line-height: 1;
-        }
-
-        /* Custom checked text: No line-through, emerald green text */
-        .habit-checkbox:checked + .habit-label-text {
-            text-decoration: none !important;
-            color: #059669 !important;
-            font-weight: 700;
-        }
-
-        .habit-checkbox:not(:checked) + .habit-label-text {
-            text-decoration: none !important;
-            color: #334155;
-            font-weight: 500;
+            animation: pop 0.2s ease-in-out;
         }
 
         /* Mobile Responsive Accordion & Calendar Helpers */
@@ -480,7 +463,7 @@
                         <i class="fa-solid fa-circle-info text-indigo-500 text-base sm:text-lg"></i>
                     </div>
                     <div class="text-[11px] sm:text-xs text-slate-600 leading-relaxed">
-                        <strong>Tip:</strong> Select participants in the sidebar to log tasks. Tap "Print" to print a custom page. Unchecked habits show a red ✕ box; checked habits show a green ✓ box with green text.
+                        <strong>Tip:</strong> Click any habit box to record your progress. Choose <strong>Green ✓</strong> for completed or <strong>Red ✕</strong> for failed. Default items remain blank until logged.
                     </div>
                 </div>
             </div>
@@ -665,6 +648,25 @@
         </div>
     </div>
 
+    <!-- HABIT STATUS CHOICE POPOVER MODAL -->
+    <div id="habitChoicePopover" class="fixed z-50 hidden bg-white rounded-2xl shadow-xl border border-slate-200 p-3 flex flex-col gap-2 min-w-[210px] transform transition-all duration-150">
+        <div class="text-[11px] font-bold text-slate-400 uppercase tracking-wider px-1 flex justify-between items-center border-b border-slate-100 pb-1.5">
+            <span id="popoverHabitTitle" class="truncate max-w-[150px] text-slate-700">Select Status</span>
+            <button onclick="closeHabitPopover()" class="text-slate-400 hover:text-slate-600 p-0.5"><i class="fa-solid fa-xmark"></i></button>
+        </div>
+        <div class="grid grid-cols-2 gap-2 pt-1">
+            <button onclick="applyHabitStatus('completed')" class="flex items-center justify-center gap-1.5 bg-emerald-50 hover:bg-emerald-100 text-emerald-700 font-bold text-xs py-2 px-2.5 rounded-xl border border-emerald-200 transition cursor-pointer active:scale-95">
+                <i class="fa-solid fa-check text-sm"></i> Completed
+            </button>
+            <button onclick="applyHabitStatus('failed')" class="flex items-center justify-center gap-1.5 bg-rose-50 hover:bg-rose-100 text-rose-700 font-bold text-xs py-2 px-2.5 rounded-xl border border-rose-200 transition cursor-pointer active:scale-95">
+                <i class="fa-solid fa-xmark text-sm"></i> Failed
+            </button>
+        </div>
+        <button onclick="applyHabitStatus(null)" class="text-[11px] text-slate-500 hover:text-slate-800 font-medium py-1 text-center hover:underline cursor-pointer border-t border-slate-100 pt-1.5 mt-0.5">
+            <i class="fa-solid fa-eraser mr-1"></i> Clear (Leave Blank)
+        </button>
+    </div>
+
     <!-- NOTIFICATION BANNER -->
     <div id="notificationBanner" class="fixed bottom-6 right-6 z-50 bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-xl border border-slate-800 transform translate-y-24 opacity-0 transition duration-300 pointer-events-none flex items-center gap-3">
         <span id="notifIcon" class="bg-indigo-500/20 text-indigo-400 p-1.5 rounded-lg flex items-center justify-center text-xs">
@@ -683,6 +685,9 @@
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'family-habit-tracker';
         const firebaseConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : null;
         const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        window.currentChoiceDate = null;
+        window.currentChoiceHabit = null;
 
         /* Mobile Accordion Helper */
         window.toggleMobileAccordion = function(id) {
@@ -742,14 +747,30 @@
             return `${year}-${m}-${d}`;
         }
 
-        function migrateHabitNameInCompletions() {
+        /* Normalizes completions data, migrating old habit names & converting boolean choices */
+        function normalizeCompletionsData() {
             if (!window.completions) return;
             Object.keys(window.completions).forEach(p => {
                 if (window.completions[p]) {
                     Object.keys(window.completions[p]).forEach(d => {
-                        if (window.completions[p][d] && window.completions[p][d]['Naked Carb'] !== undefined) {
-                            window.completions[p][d]['Low Carb Meal'] = window.completions[p][d]['Naked Carb'];
-                            delete window.completions[p][d]['Naked Carb'];
+                        if (window.completions[p][d]) {
+                            Object.keys(window.completions[p][d]).forEach(h => {
+                                let val = window.completions[p][d][h];
+                                // Rename legacy habit name if present
+                                if (h === 'Naked Carb') {
+                                    window.completions[p][d]['Low Carb Meal'] = val;
+                                    delete window.completions[p][d]['Naked Carb'];
+                                    h = 'Low Carb Meal';
+                                }
+                                // Convert legacy boolean structure:
+                                // true -> 'completed' (Green checkmark)
+                                // false or null -> deleted (Blank)
+                                if (val === true) {
+                                    window.completions[p][d][h] = 'completed';
+                                } else if (val === false || val === null) {
+                                    delete window.completions[p][d][h];
+                                }
+                            });
                         }
                     });
                 }
@@ -820,7 +841,7 @@
                 window.bodyMetrics = mergedMetrics;
                 if (foundActivePerson) window.activeParticipant = foundActivePerson;
 
-                migrateHabitNameInCompletions();
+                normalizeCompletionsData();
                 saveFallbackLocalState();
             } catch (e) {
                 console.warn("Could not load from localStorage:", e);
@@ -855,6 +876,16 @@
         window.addEventListener('pagehide', () => saveFallbackLocalState());
         document.addEventListener('visibilitychange', () => {
             if (document.visibilityState === 'hidden') saveFallbackLocalState();
+        });
+
+        /* Close popover on outside click */
+        document.addEventListener('click', (e) => {
+            const popover = document.getElementById('habitChoicePopover');
+            if (popover && !popover.classList.contains('hidden')) {
+                if (!popover.contains(e.target) && !e.target.closest('.habit-item-row')) {
+                    window.closeHabitPopover();
+                }
+            }
         });
 
         window.showToast = function(message, iconClass = "fa-circle-check") {
@@ -901,7 +932,6 @@
 
             isSaving = true;
             try {
-                // Rule 1: STRICT Firestore Path -> /artifacts/{appId}/public/data/{collectionName}/{docId}
                 const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'habitTracker', 'currentState');
                 await setDoc(docRef, {
                     habits: window.habits,
@@ -1004,7 +1034,7 @@
                     if (parsed.completions) window.completions = parsed.completions;
                     if (parsed.bodyMetrics) window.bodyMetrics = parsed.bodyMetrics;
 
-                    migrateHabitNameInCompletions();
+                    normalizeCompletionsData();
                     saveStateToCloud();
                     renderAll();
                     showToast("Restored & loaded data snapshot!", "fa-clock-rotate-left");
@@ -1060,7 +1090,7 @@
                         window.activeParticipant = parsed.activeParticipant;
                     }
 
-                    migrateHabitNameInCompletions();
+                    normalizeCompletionsData();
                     saveStateToCloud();
                     renderAll();
                     closeBackupModal();
@@ -1111,7 +1141,7 @@
                 for (let d = 1; d <= totalDays; d++) {
                     const dStr = formatDateKey(year, month, d);
                     const dayData = userCompletions[dStr] || {};
-                    window.habits.forEach(h => { if (dayData[h]) completedCount++; });
+                    window.habits.forEach(h => { if (dayData[h] === 'completed' || dayData[h] === true) completedCount++; });
                 }
                 const pct = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
 
@@ -1127,12 +1157,26 @@
                     
                     let habitsHtml = '';
                     window.habits.forEach(h => {
-                        const isDone = !!dayData[h];
-                        const checkChar = isDone ? '✓' : '✕';
-                        const checkBg = isDone ? '#10b981' : '#ef4444';
-                        const checkBorder = isDone ? '#059669' : '#dc2626';
-                        const textCol = isDone ? '#059669' : '#334155';
-                        const fontW = isDone ? 'bold' : 'normal';
+                        const status = dayData[h];
+                        let checkChar = '';
+                        let checkBg = '#ffffff';
+                        let checkBorder = '#cbd5e1';
+                        let textCol = '#334155';
+                        let fontW = 'normal';
+
+                        if (status === 'completed' || status === true) {
+                            checkChar = '✓';
+                            checkBg = '#10b981';
+                            checkBorder = '#059669';
+                            textCol = '#059669';
+                            fontW = 'bold';
+                        } else if (status === 'failed') {
+                            checkChar = '✕';
+                            checkBg = '#ef4444';
+                            checkBorder = '#dc2626';
+                            textCol = '#dc2626';
+                            fontW = 'semibold';
+                        }
 
                         habitsHtml += `
                             <div style="display: flex; align-items: center; gap: 4px; margin-bottom: 3px;">
@@ -1285,14 +1329,67 @@
             showToast(`Removed habit "${hName}"`, "fa-trash-can");
         };
 
-        window.toggleHabit = function(dateStr, habitName, isChecked) {
+        /* Habit Choice Popover Actions */
+        window.openHabitChoice = function(event, dateStr, habitName) {
+            event.stopPropagation();
+            window.currentChoiceDate = dateStr;
+            window.currentChoiceHabit = habitName;
+
+            const popover = document.getElementById('habitChoicePopover');
+            const titleEl = document.getElementById('popoverHabitTitle');
+            if (titleEl) titleEl.textContent = habitName;
+
+            if (popover) {
+                popover.classList.remove('hidden');
+                const targetEl = event.currentTarget;
+                const rect = targetEl.getBoundingClientRect();
+                const popoverWidth = 220;
+                const popoverHeight = 110;
+
+                let left = rect.left;
+                let top = rect.bottom + 6;
+
+                if (left + popoverWidth > window.innerWidth - 10) {
+                    left = window.innerWidth - popoverWidth - 10;
+                }
+                if (left < 10) left = 10;
+
+                if (top + popoverHeight > window.innerHeight - 10) {
+                    top = rect.top - popoverHeight - 6;
+                }
+
+                popover.style.left = `${left}px`;
+                popover.style.top = `${top}px`;
+            }
+        };
+
+        window.closeHabitPopover = function() {
+            const popover = document.getElementById('habitChoicePopover');
+            if (popover) popover.classList.add('hidden');
+            window.currentChoiceDate = null;
+            window.currentChoiceHabit = null;
+        };
+
+        window.applyHabitStatus = function(status) {
+            const dateStr = window.currentChoiceDate;
+            const habitName = window.currentChoiceHabit;
             const p = window.activeParticipant;
+
+            if (!dateStr || !habitName || !p) return;
+
             if (!window.completions[p]) window.completions[p] = {};
             if (!window.completions[p][dateStr]) window.completions[p][dateStr] = {};
 
-            window.completions[p][dateStr][habitName] = isChecked;
+            if (status) {
+                window.completions[p][dateStr][habitName] = status;
+            } else {
+                delete window.completions[p][dateStr][habitName];
+            }
+
+            window.closeHabitPopover();
             saveStateToCloud();
             renderCalendarHeaderStats();
+            renderCalendar();
             renderLeaderboard();
             if (window.activeMainView === 'dashboard') {
                 renderDashboard();
@@ -1509,7 +1606,7 @@
             for (let d = 1; d <= totalDays; d++) {
                 const dStr = formatDateKey(year, month, d);
                 const dayData = userCompletions[dStr] || {};
-                window.habits.forEach(h => { if (dayData[h]) completedCount++; });
+                window.habits.forEach(h => { if (dayData[h] === 'completed' || dayData[h] === true) completedCount++; });
             }
 
             const pct = totalPossible > 0 ? Math.round((completedCount / totalPossible) * 100) : 0;
@@ -1559,12 +1656,26 @@
 
                 let habitsChecklistHtml = '';
                 window.habits.forEach(h => {
-                    const isChecked = !!dayData[h];
+                    const status = dayData[h]; // 'completed', 'failed', or null/undefined
+                    let badgeClass = 'habit-status-btn status-blank';
+                    let labelClass = 'text-slate-600 font-medium';
+                    let iconContent = '';
+
+                    if (status === 'completed' || status === true) {
+                        badgeClass = 'habit-status-btn status-completed';
+                        labelClass = 'text-emerald-700 font-bold';
+                        iconContent = '✓';
+                    } else if (status === 'failed') {
+                        badgeClass = 'habit-status-btn status-failed';
+                        labelClass = 'text-rose-600 font-semibold';
+                        iconContent = '✕';
+                    }
+
                     habitsChecklistHtml += `
-                        <label class="flex items-center gap-1 sm:gap-1.5 cursor-pointer select-none group py-0.5">
-                            <input type="checkbox" ${isChecked ? 'checked' : ''} onchange="toggleHabit('${dateStr}', '${h}', this.checked)" class="habit-checkbox">
-                            <span class="habit-label-text text-[9px] sm:text-xs tracking-tight truncate">${h}</span>
-                        </label>
+                        <div onclick="openHabitChoice(event, '${dateStr}', '${h}')" class="habit-item-row flex items-center gap-1.5 cursor-pointer select-none group py-0.5 rounded-lg hover:bg-slate-50 px-1 -mx-1 transition">
+                            <span class="${badgeClass}">${iconContent}</span>
+                            <span class="habit-label-text text-[9px] sm:text-xs tracking-tight truncate ${labelClass}">${h}</span>
+                        </div>
                     `;
                 });
 
@@ -1598,7 +1709,7 @@
                 for (let d = 1; d <= totalDays; d++) {
                     const dStr = formatDateKey(year, month, d);
                     const dayData = pCompletions[dStr] || {};
-                    window.habits.forEach(h => { if (dayData[h]) count++; });
+                    window.habits.forEach(h => { if (dayData[h] === 'completed' || dayData[h] === true) count++; });
                 }
                 const pct = totalPossible > 0 ? Math.round((count / totalPossible) * 100) : 0;
                 return { name: p, count, pct };
@@ -1746,7 +1857,7 @@
                     const dStr = formatDateKey(year, month, parseInt(d));
                     const dayData = userCompletions[dStr] || {};
                     let count = 0;
-                    window.habits.forEach(h => { if (dayData[h]) count++; });
+                    window.habits.forEach(h => { if (dayData[h] === 'completed' || dayData[h] === true) count++; });
                     return count;
                 });
 
@@ -1755,7 +1866,7 @@
                     data: {
                         labels: dayLabels,
                         datasets: [{
-                            label: 'Habits Executed',
+                            label: 'Habits Completed',
                             data: consistencyData,
                             backgroundColor: '#818cf8',
                             borderRadius: 6
@@ -1779,7 +1890,7 @@
                     let total = 0;
                     for (let d = 1; d <= totalDays; d++) {
                         const dStr = formatDateKey(year, month, d);
-                        if (userCompletions[dStr] && userCompletions[dStr][h]) total++;
+                        if (userCompletions[dStr] && (userCompletions[dStr][h] === 'completed' || userCompletions[dStr][h] === true)) total++;
                     }
                     return total;
                 });
@@ -1852,7 +1963,6 @@
                             userId = user.uid;
                             updateCloudStatusBadge(true, "Cloud Connected");
                             
-                            // Rule 1 & Rule 2: Simple snapshot query on public data path
                             const docRef = doc(db, 'artifacts', appId, 'public', 'data', 'habitTracker', 'currentState');
                             onSnapshot(docRef, (snapshot) => {
                                 if (snapshot.exists() && !isSaving) {
@@ -1864,7 +1974,7 @@
                                     if (data.activeParticipant && window.participants.includes(data.activeParticipant)) {
                                         window.activeParticipant = data.activeParticipant;
                                     }
-                                    migrateHabitNameInCompletions();
+                                    normalizeCompletionsData();
                                     saveFallbackLocalState();
                                     renderAll();
                                 }

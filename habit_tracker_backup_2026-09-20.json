@@ -1,0 +1,504 @@
+{
+  "habits": [
+    "Fat Burn",
+    "Junk Snack",
+    "Weight",
+    "Low Carb Meal",
+    "EAM"
+  ],
+  "participants": [
+    "Emily",
+    "Dad",
+    "Stephanie"
+  ],
+  "activeParticipant": "Dad",
+  "completions": {
+    "Dad": {
+      "2026-08-13": {
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-20": {
+        "Junk Snack": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-09-13": {
+        "Fat Burn": "completed",
+        "Junk Snack": "failed",
+        "Weight": "failed",
+        "Low Carb Meal": "failed",
+        "EAM": "failed"
+      },
+      "2026-09-05": {
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed",
+        "Fat Burn": "completed",
+        "Weight": "completed",
+        "EAM": "failed"
+      },
+      "2026-09-07": {
+        "Junk Snack": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed",
+        "Weight": "completed",
+        "EAM": "failed"
+      },
+      "2026-09-03": {
+        "Junk Snack": "completed",
+        "EAM": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "Weight": "failed"
+      },
+      "2026-09-04": {
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "Junk Snack": "completed",
+        "Weight": "failed",
+        "EAM": "failed"
+      },
+      "2026-08-14": {
+        "Low Carb Meal": "completed",
+        "Weight": "completed",
+        "EAM": "completed",
+        "Junk Snack": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-01": {
+        "Fat Burn": "completed",
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed"
+      },
+      "2026-08-04": {
+        "Weight": "completed",
+        "EAM": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-05": {
+        "EAM": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed"
+      },
+      "2026-09-10": {
+        "Junk Snack": "completed",
+        "Weight": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "EAM": "failed"
+      },
+      "2026-09-19": {
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed",
+        "Junk Snack": "failed",
+        "Weight": "failed",
+        "EAM": "failed"
+      },
+      "2026-09-11": {
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "Junk Snack": "failed",
+        "Low Carb Meal": "failed",
+        "EAM": "failed"
+      },
+      "2026-08-21": {
+        "Junk Snack": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-28": {
+        "Fat Burn": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-09-14": {
+        "Low Carb Meal": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "EAM": "failed",
+        "Junk Snack": "failed"
+      },
+      "2026-08-18": {
+        "EAM": "completed",
+        "Weight": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-15": {
+        "Junk Snack": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-26": {
+        "Junk Snack": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-09-08": {
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "EAM": "failed"
+      },
+      "2026-09-18": {
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed",
+        "Weight": "failed",
+        "EAM": "failed"
+      },
+      "2026-09-02": {
+        "Junk Snack": "completed",
+        "Weight": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "EAM": "failed"
+      },
+      "2026-09-15": {
+        "Weight": "completed",
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "EAM": "failed"
+      },
+      "2026-08-08": {
+        "Weight": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-09-12": {
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed",
+        "Weight": "completed",
+        "EAM": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-25": {
+        "Weight": "completed",
+        "EAM": "completed",
+        "Junk Snack": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-23": {
+        "EAM": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-19": {
+        "Fat Burn": "completed",
+        "EAM": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-16": {
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "Weight": "completed"
+      },
+      "2026-08-30": {
+        "Weight": "completed",
+        "Junk Snack": "completed",
+        "Fat Burn": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-07": {
+        "Junk Snack": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed"
+      },
+      "2026-08-09": {
+        "Fat Burn": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed"
+      },
+      "2026-09-09": {
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "failed",
+        "EAM": "failed",
+        "Junk Snack": "failed"
+      },
+      "2026-08-03": {
+        "Junk Snack": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-06": {
+        "EAM": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-12": {
+        "Fat Burn": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-24": {
+        "Fat Burn": "completed",
+        "EAM": "completed",
+        "Junk Snack": "completed",
+        "Weight": "completed"
+      },
+      "2026-09-01": {
+        "Fat Burn": "completed",
+        "Weight": "completed",
+        "Junk Snack": "failed",
+        "Low Carb Meal": "failed",
+        "EAM": "failed"
+      },
+      "2026-09-17": {
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "EAM": "failed",
+        "Low Carb Meal": "failed",
+        "Junk Snack": "failed"
+      },
+      "2026-08-11": {
+        "EAM": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-02": {
+        "Weight": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-22": {
+        "Weight": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-31": {
+        "EAM": "completed",
+        "Weight": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-29": {
+        "Junk Snack": "completed",
+        "Fat Burn": "completed",
+        "EAM": "completed"
+      },
+      "2026-09-06": {
+        "Fat Burn": "completed",
+        "Weight": "completed",
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed",
+        "EAM": "failed"
+      },
+      "2026-08-17": {
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "EAM": "completed",
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed"
+      },
+      "2026-08-10": {
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed",
+        "Junk Snack": "completed",
+        "Weight": "completed"
+      },
+      "2026-09-16": {
+        "Fat Burn": "completed",
+        "Weight": "completed",
+        "Junk Snack": "failed",
+        "Low Carb Meal": "failed",
+        "EAM": "failed"
+      },
+      "2026-08-27": {
+        "EAM": "completed"
+      },
+      "2026-09-20": {
+        "Fat Burn": "completed"
+      }
+    },
+    "Emily": {
+      "2026-08-16": {
+        "Junk Snack": "completed",
+        "EAM": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed"
+      },
+      "2026-08-23": {
+        "EAM": "completed"
+      },
+      "2026-08-19": {
+        "Fat Burn": "completed"
+      },
+      "2026-08-07": {
+        "EAM": "completed"
+      },
+      "2026-08-09": {
+        "Fat Burn": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-03": {
+        "Junk Snack": "completed",
+        "Weight": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-17": {
+        "EAM": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-01": {
+        "Junk Snack": "completed",
+        "EAM": "completed",
+        "Low Carb Meal": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-10": {
+        "EAM": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-20": {
+        "Fat Burn": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-08": {
+        "EAM": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-21": {
+        "Fat Burn": "completed"
+      },
+      "2026-08-25": {},
+      "2026-08-24": {
+        "EAM": "completed",
+        "Junk Snack": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-18": {
+        "Fat Burn": "completed",
+        "Weight": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-11": {
+        "EAM": "completed"
+      },
+      "2026-08-02": {
+        "EAM": "completed",
+        "Fat Burn": "completed"
+      }
+    },
+    "Stephanie": {
+      "2026-08-06": {
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed",
+        "Weight": "completed"
+      },
+      "2026-08-08": {
+        "Fat Burn": "completed",
+        "EAM": "completed",
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-12": {
+        "Junk Snack": "completed",
+        "Low Carb Meal": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-18": {
+        "Weight": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed"
+      },
+      "2026-08-02": {
+        "EAM": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-11": {
+        "Weight": "completed",
+        "Low Carb Meal": "completed",
+        "EAM": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-19": {
+        "EAM": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-09": {
+        "Fat Burn": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed",
+        "Low Carb Meal": "completed",
+        "Weight": "completed"
+      },
+      "2026-08-07": {
+        "EAM": "completed",
+        "Fat Burn": "completed"
+      },
+      "2026-08-03": {
+        "Weight": "completed",
+        "EAM": "completed",
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-17": {
+        "Low Carb Meal": "completed",
+        "EAM": "completed",
+        "Fat Burn": "completed",
+        "Weight": "completed"
+      },
+      "2026-08-01": {
+        "EAM": "completed",
+        "Fat Burn": "completed",
+        "Low Carb Meal": "completed"
+      },
+      "2026-08-05": {
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed",
+        "Weight": "completed"
+      },
+      "2026-08-10": {
+        "Low Carb Meal": "completed",
+        "EAM": "completed",
+        "Weight": "completed",
+        "Junk Snack": "completed"
+      },
+      "2026-08-04": {
+        "Low Carb Meal": "completed",
+        "Junk Snack": "completed",
+        "EAM": "completed"
+      }
+    }
+  },
+  "bodyMetrics": {
+    "Stephanie": {
+      "2026-08-02": {
+        "weight": 246.4,
+        "tummy": 44
+      }
+    },
+    "Dad": {
+      "2026-08-29": {
+        "updatedAt": "2026-08-29T14:45:36.966Z",
+        "weight": 161,
+        "tummy": 37
+      },
+      "2026-08-01": {
+        "tummy": 37,
+        "weight": 164
+      }
+    },
+    "Emily": {
+      "2026-08-04": {
+        "weight": 146.8,
+        "tummy": 37
+      }
+    }
+  },
+  "exportedAt": "2026-09-20T16:25:58.088Z"
+}
